@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+@theme {
+    --font-sans: 'Noto Sans', 'Figtree', ui-sans-serif, system-ui, sans-serif;
+    --font-heading: 'Figtree', 'Noto Sans', ui-sans-serif, system-ui, sans-serif;
+
+    --color-brand-primary: #0E7490;    /* Cyan 700 - >5.3:1 contrast on white */
+    --color-brand-cyan: #0891B2;       /* Cyan 600 */
+    --color-brand-accent: #047857;     /* Emerald 700 - >5.4:1 contrast on white */
+    --color-brand-surface: #F0FDFA;    /* Soft Medical Mint-Cyan Tint */
+    --color-brand-ink: #0F172A;        /* Slate 900 */
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+        font-family: var(--font-sans);
+        color: var(--color-brand-ink);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html {
+            scroll-behavior: auto;
+        }
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+}
+
+/* Soft UI / Subtle Clinical Depth Utility */
+.med-card {
+    background: #FFFFFF;
+    border: 1px solid #CFFAFE;
+    border-radius: 1rem;
+    box-shadow: 0 6px 20px -4px rgba(8, 145, 178, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+    transition: box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.med-card:hover {
+    border-color: #67E8F9;
+    box-shadow: 0 12px 28px -6px rgba(8, 145, 178, 0.14), 0 4px 10px -2px rgba(15, 23, 42, 0.06);
+}
