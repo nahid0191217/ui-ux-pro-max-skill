@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Admin & Coordinator Control Panel | Med Solutions')
+@section('title', ($panel === 'staff' ? 'Staff Panel' : 'Admin Panel') . ' | Med Solutions')
 
 @section('content')
 <section class="py-10">
@@ -8,9 +8,9 @@
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div>
                 <span class="rounded-full bg-cyan-100 px-3 py-1 text-xs font-bold text-cyan-950">
-                    Role: {{ strtoupper(auth()->user()->role->value) }}
+                    Role: {{ strtoupper(auth()->user()->role->value) }} ({{ $panel === 'staff' ? 'Staff Panel' : 'Admin Panel' }})
                 </span>
-                <h1 class="mt-2 font-heading text-2xl font-extrabold text-slate-900">Med Solutions Admin & Coordinator Control Panel</h1>
+                <h1 class="mt-2 font-heading text-2xl font-extrabold text-slate-900">{{ $panel === 'staff' ? 'Med Solutions Care Coordinator Panel' : 'Med Solutions Admin & Coordinator Control Panel' }}</h1>
             </div>
         </div>
 
@@ -46,12 +46,16 @@
             <button type="button" @click="tab = 'telemedicine'" :class="tab === 'telemedicine' ? 'bg-cyan-800 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'" class="cursor-pointer rounded-xl px-4 py-2.5 text-sm font-bold transition">
                 2. Telemedicine & Video Links
             </button>
+            @if ($panel === 'admin')
             <button type="button" @click="tab = 'cms'" :class="tab === 'cms' ? 'bg-cyan-800 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'" class="cursor-pointer rounded-xl px-4 py-2.5 text-sm font-bold transition">
                 3. Services & Content (CMS)
             </button>
+            @endif
+            @if ($panel === 'admin')
             <button type="button" @click="tab = 'users'" :class="tab === 'users' ? 'bg-cyan-800 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'" class="cursor-pointer rounded-xl px-4 py-2.5 text-sm font-bold transition">
                 4. User & Role Management
             </button>
+            @endif
         </div>
 
         <!-- TAB 1: Service Requests & Visa/Appointment Management -->
@@ -162,6 +166,7 @@
             @endforeach
         </div>
 
+@if ($panel === 'admin')
         <!-- TAB 3: CMS Services Management -->
         <div x-show="tab === 'cms'" class="mt-6 grid gap-4 md:grid-cols-2">
             @foreach ($services as $svc)
@@ -181,6 +186,8 @@
             @endforeach
         </div>
 
+@endif
+@if ($panel === 'admin')
         <!-- TAB 4: User & Role Management -->
         <div x-show="tab === 'users'" class="med-card mt-6 overflow-hidden">
             <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
@@ -217,6 +224,7 @@
                 </tbody>
             </table>
         </div>
+@endif
     </div>
 </section>
 @endsection

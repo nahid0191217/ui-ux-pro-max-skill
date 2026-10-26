@@ -122,8 +122,12 @@ php artisan serve
 
 ### Login, Roles & Access Control
 - **Sign in / Register:** `/login` and `/register` (patients self-register; the public form can only create `patient` accounts).
-- **Roles:** `admin` (full access, incl. user role changes), `staff` (leads, visas, appointments, telemedicine links), `patient` (own requests and consultations only).
-- **Guards:** `/patient` requires sign-in; `/admin` requires `admin` or `staff`; role changes require `admin`. Every form is CSRF-protected.
+- **Panels (one per role, used as the sign-in landing page):**
+  - `admin` → `/admin` (Admin Panel): leads, visas, telemedicine, CMS content, user & role management.
+  - `staff` → `/staff` (Staff Panel): leads, visas, appointments, telemedicine links, inquiries. No CMS or role management.
+  - `patient` → `/patient` (Patient Portal): own requests and consultations only.
+- **Guards:** each panel is open only to its own role; other roles are redirected to their own panel. Role changes and CMS edits are admin-only. Every form is CSRF-protected.
+- **Cookies:** the session cookie is `SameSite=None; Secure; Partitioned` so sign-in works when the app is shown inside another site's iframe (e.g. the Arena preview).
 - **Tracking privacy:** a tracking code shows details only to its owner, to staff, to the browser that created it, or to anyone who supplies the registered phone number.
 - **Brute-force protection:** login is rate-limited (throttle middleware in Laravel; 5 failures / 5 minutes per email in the preview).
 

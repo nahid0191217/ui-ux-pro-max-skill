@@ -51,11 +51,17 @@ class AuthenticatedSessionController extends Controller
         RateLimiter::clear($throttleKey);
         $request->session()->regenerate();
 
-        $defaultRedirect = $request->user()->canManagePortal()
-            ? route('admin.dashboard', absolute: false)
-            : route('patient.dashboard', absolute: false);
+        $user = $request->user();
+        $intended = $request->session()->pull('url.intended');
+        $sameSite = str_starts_with((string) $intended, url('/'));
+        $intendedPath = $sameSite ? (parse_url($intended, PHP_URL_PATH) ?? '/') : '/';
 
-        return redirect()->intended($defaultRedirect);
+        // A patient who was bounced from /admin must not be sent back there after sign-in.
+        $target = ($sameSite && $user->canAccessPath($intendedPath))
+            ? $intended
+            : route($user->panelRoute(), absolute: false);
+
+        return redirect($target);
     }
 
     /**

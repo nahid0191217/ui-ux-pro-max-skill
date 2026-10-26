@@ -35,7 +35,7 @@ class DemoRoleSwitchController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        $target = $user->canManagePortal() ? route('admin.dashboard') : route('patient.dashboard');
+        $target = route($user->panelRoute());
 
         return redirect($target)->with(
             'success',

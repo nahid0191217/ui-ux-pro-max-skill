@@ -39,7 +39,7 @@ Route::post('/telemedicine', [ConsultationController::class, 'store'])
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function (Request $request) {
         if ($request->user()->canManagePortal()) {
-            return redirect()->route('admin.dashboard');
+            return redirect()->route($request->user()->panelRoute());
         }
         return app(PatientDashboardController::class)->index($request);
     })->name('dashboard');
@@ -57,25 +57,46 @@ Route::middleware(['auth', 'verified'])->group(function () {
 | Admin & Staff Panel Routes (Role-Based Access Control)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:admin,staff'])
+/*
+|--------------------------------------------------------------------------
+| Admin Panel (admin only): dashboard, CMS content, user & role management
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
+        Route::patch('/services/{service}', [AdminDashboardController::class, 'updateServiceContent'])
+            ->name('services.update');
+
+        Route::patch('/users/{user}/role', [AdminDashboardController::class, 'updateUserRole'])
+            ->name('users.update-role');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| Staff Panel (staff only): leads, visas, appointments, telemedicine links
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:staff'])
+    ->prefix('staff')
+    ->name('staff.')
+    ->group(function () {
+        Route::get('/dashboard', [AdminDashboardController::class, 'staffIndex'])->name('dashboard');
+    });
+
+// Lead & telemedicine updates are shared by the admin and staff panels
+Route::middleware(['auth', 'role:admin,staff'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
         Route::patch('/service-requests/{serviceRequest}', [AdminDashboardController::class, 'updateServiceRequest'])
             ->name('service-requests.update');
 
         Route::patch('/consultations/{consultation}', [AdminDashboardController::class, 'updateConsultation'])
             ->name('consultations.update');
-
-        Route::patch('/services/{service}', [AdminDashboardController::class, 'updateServiceContent'])
-            ->name('services.update');
-
-        // Strict Admin-only User Role Management
-        Route::patch('/users/{user}/role', [AdminDashboardController::class, 'updateUserRole'])
-            ->middleware('role:admin')
-            ->name('users.update-role');
     });
 
 if (file_exists(__DIR__ . '/auth.php')) {

@@ -436,8 +436,31 @@ def current_user_id():
     return user["id"] if user is not None else None
 
 
-def dashboard_path_for(user) -> str:
-    return "/admin" if can_manage(user) else "/patient"
+def panel_for(user) -> str:
+    """Each role lands in exactly one panel."""
+    if user is None:
+        return "/login"
+    role = user["role"]
+    if role == "admin":
+        return "/admin"
+    if role == "staff":
+        return "/staff"
+    return "/patient"
+
+
+dashboard_path_for = panel_for
+
+
+def landing_for(user, requested: str) -> str:
+    """Honour a stored ?next= only if the role may open it; otherwise use the role's own panel."""
+    path = urllib.parse.urlparse(requested or "").path
+    if path.startswith("/admin") and user["role"] != "admin":
+        return panel_for(user)
+    if path.startswith("/staff") and user["role"] != "staff":
+        return panel_for(user)
+    if path.startswith("/patient") and user["role"] != "patient":
+        return panel_for(user)
+    return requested or panel_for(user)
 
 
 def safe_next(value: str) -> str:
@@ -477,13 +500,13 @@ def _inject_csrf(html_text: str) -> str:
     )
 
 
-def render_forbidden(message: str = "This area is restricted to authorized Med Solutions staff and administrators.") -> bytes:
+def render_forbidden(message: str = "This area is restricted to authorized Med Solutions staff and administrators.", title: str = "Restricted Area") -> bytes:
     body = f"""
     <section class="py-20">
         <div class="mx-auto max-w-lg px-4 text-center">
             <div class="med-card p-8">
                 <p class="text-xs font-bold uppercase tracking-wider text-red-700">403 · Access Denied</p>
-                <h1 class="mt-2 font-heading text-2xl font-extrabold text-slate-900">Restricted Area</h1>
+                <h1 class="mt-2 font-heading text-2xl font-extrabold text-slate-900">{e(title)}</h1>
                 <p class="mt-3 text-sm text-slate-600">{e(message)}</p>
                 <div class="mt-6 flex justify-center gap-3">
                     <a href="/" class="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50">Back to Home</a>
@@ -632,7 +655,8 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
             "</form>"
         )
         if can_manage(user):
-            acct_html = '<a href="/admin" class="hidden sm:inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50">Admin Panel</a>'
+            panel_label = "Admin Panel" if user["role"] == "admin" else "Staff Panel"
+            acct_html = '<a href="' + panel_for(user) + '" class="hidden sm:inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50">' + panel_label + "</a>"
         else:
             acct_html = '<a href="/patient" class="hidden sm:inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50">My Portal</a>'
     else:
@@ -787,7 +811,7 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
                     <ul class="mt-3 space-y-2 text-sm text-slate-400">
                         <li><a href="/track?tracking_code=MS-2026-DEMO1" class="hover:text-cyan-400">Live Status Tracker (Demo)</a></li>
                         <li><a href="/patient" class="hover:text-cyan-400">Patient Portal Dashboard</a></li>
-                        <li><a href="/admin" class="hover:text-cyan-400">Admin & Staff Control Panel</a></li>
+                        <li><a href="/login" class="hover:text-cyan-400">Staff / Admin Sign In</a></li>
                     </ul>
                 </div>
                 <div>
@@ -1455,7 +1479,11 @@ def render_patient_portal(flash_msg: str = "") -> bytes:
     return layout("Patient Portal Dashboard | Med Solutions", body, "/patient", flash_msg=flash_msg)
 
 
-def render_admin_dashboard(flash_msg: str = "") -> bytes:
+def render_admin_dashboard(flash_msg: str = "", panel: str = "admin") -> bytes:
+    is_staff = panel == "staff"
+    current_name = _ctx.user["name"] if getattr(_ctx, "user", None) is not None else ""
+    role_label = ("STAFF" if is_staff else "ADMIN") + " (" + e(current_name) + ")"
+    panel_title = "Med Solutions Care Coordinator Panel" if is_staff else "Med Solutions Admin & Coordinator Control Panel"
     conn = get_db()
     reqs = conn.execute("SELECT * FROM service_requests ORDER BY id DESC").fetchall()
     consults = conn.execute("SELECT * FROM consultations ORDER BY id DESC").fetchall()
@@ -1578,13 +1606,35 @@ def render_admin_dashboard(flash_msg: str = "") -> bytes:
         for c in contacts
     ) or '<p class="text-xs text-slate-500">No contact inquiries received yet.</p>'
 
+    cms_section = "" if is_staff else f"""
+            <!-- Section 3: CMS Content -->
+            <div class="mt-10">
+                <h2 class="font-heading text-lg font-extrabold text-slate-900">3. Services & Content Management (CMS)</h2>
+                <div class="mt-4 grid gap-4 md:grid-cols-2">{cms_cards}</div>
+            </div>
+
+"""
+    users_card = "" if is_staff else f"""
+                <div class="med-card overflow-hidden lg:col-span-8">
+                    <div class="border-b border-slate-100 px-5 py-4"><h2 class="font-heading font-bold text-slate-900">4. User & Role Management (Admin / Staff / Patient)</h2></div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+                            <thead class="bg-slate-50 text-xs font-bold uppercase text-slate-600">
+                                <tr><th class="px-5 py-3">Full Name</th><th class="px-5 py-3">Contact</th><th class="px-5 py-3">Role</th><th class="px-5 py-3">Update Role</th></tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">{user_rows}</tbody>
+                        </table>
+                    </div>
+                </div>
+"""
+    contacts_span = "lg:col-span-12" if is_staff else "lg:col-span-4"
     body = f"""
     <section class="py-10">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                    <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-950">RBAC Role: ADMIN (Dr. Mahmudul Hasan)</span>
-                    <h1 class="mt-2 font-heading text-2xl font-extrabold text-slate-900">Med Solutions Admin & Coordinator Control Panel</h1>
+                    <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-950">RBAC Role: {role_label}</span>
+                    <h1 class="mt-2 font-heading text-2xl font-extrabold text-slate-900">{panel_title}</h1>
                 </div>
             </div>
 
@@ -1620,33 +1670,18 @@ def render_admin_dashboard(flash_msg: str = "") -> bytes:
                 <div class="mt-4 space-y-4">{tm_cards}</div>
             </div>
 
-            <!-- Section 3: CMS Content -->
-            <div class="mt-10">
-                <h2 class="font-heading text-lg font-extrabold text-slate-900">3. Services & Content Management (CMS)</h2>
-                <div class="mt-4 grid gap-4 md:grid-cols-2">{cms_cards}</div>
-            </div>
-
+            {cms_section}
             <!-- Section 4: Users & Contacts -->
             <div class="mt-10 grid gap-6 lg:grid-cols-12">
-                <div class="med-card overflow-hidden lg:col-span-8">
-                    <div class="border-b border-slate-100 px-5 py-4"><h2 class="font-heading font-bold text-slate-900">4. User & Role Management (Admin / Staff / Patient)</h2></div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
-                            <thead class="bg-slate-50 text-xs font-bold uppercase text-slate-600">
-                                <tr><th class="px-5 py-3">Full Name</th><th class="px-5 py-3">Contact</th><th class="px-5 py-3">Role</th><th class="px-5 py-3">Update Role</th></tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100">{user_rows}</tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="med-card p-5 lg:col-span-4">
+            {users_card}
+                <div class="med-card p-5 {contacts_span}">
                     <h2 class="font-heading font-bold text-slate-900">Recent Contact Inquiries</h2>
                     <div class="mt-3">{contact_rows}</div>
                 </div>
             </div>
         </div>
     </section>"""
-    return layout("Admin Dashboard | Med Solutions", body, "/admin", flash_msg=flash_msg)
+    return layout("Admin Dashboard | Med Solutions" if not is_staff else "Staff Panel | Med Solutions", body, "/staff" if is_staff else "/admin", flash_msg=flash_msg)
 
 
 class MedSolutionsHandler(BaseHTTPRequestHandler):
@@ -1654,7 +1689,9 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
     _secure = False
 
     def _send_cookie(self) -> None:
-        flags = "; Path=/; HttpOnly; SameSite=Lax" + ("; Secure" if self._secure else "")
+        # Served inside a cross-site iframe in Arena, so SameSite=Lax cookies are dropped on POST.
+        # SameSite=None requires Secure; Partitioned keeps it working under third-party cookie blocking.
+        flags = "; Path=/; HttpOnly; Secure; SameSite=None; Partitioned"
         self.send_header("Set-Cookie", f"{SESSION_COOKIE}={self._token}{flags}")
 
     def _begin(self) -> None:
@@ -1712,7 +1749,7 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
             return
         clear_login_failures(email)
         self._rotate_session(row["id"])
-        self._redirect(next_url or dashboard_path_for(row))
+        self._redirect(landing_for(row, next_url))
 
     def _handle_register(self, form_data) -> None:
         name = form_data.get("name", "").strip()
@@ -1774,7 +1811,7 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
             return
         self._rotate_session(row["id"])
         msg = urllib.parse.quote(f"Demo mode: now signed in as {row['name']} ({row['role']}).")
-        self._redirect(f"{dashboard_path_for(row)}?flash={msg}")
+        self._redirect(f"{panel_for(row)}?flash={msg}")
 
     def _send_html(self, content: bytes, status: int = 200, head_only: bool = False) -> None:
         self.send_response(status)
@@ -1831,12 +1868,12 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
             self._send_html(render_telemedicine(flash_msg=flash), head_only=head_only)
         elif path == "/login":
             if _ctx.user is not None:
-                self._redirect(dashboard_path_for(_ctx.user))
+                self._redirect(panel_for(_ctx.user))
             else:
                 self._send_html(render_login(next_url=safe_next(qs.get("next", [""])[0])), head_only=head_only)
         elif path == "/register":
             if _ctx.user is not None:
-                self._redirect(dashboard_path_for(_ctx.user))
+                self._redirect(panel_for(_ctx.user))
             else:
                 self._send_html(render_register(), head_only=head_only)
         elif path == "/patient":
@@ -1844,13 +1881,15 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
                 self._redirect("/login?next=/patient")
             else:
                 self._send_html(render_patient_portal(flash_msg=flash), head_only=head_only)
-        elif path == "/admin":
+        elif path in ("/admin", "/staff"):
+            wanted = "admin" if path == "/admin" else "staff"
             if _ctx.user is None:
-                self._redirect("/login?next=/admin")
-            elif not can_manage(_ctx.user):
-                self._send_html(render_forbidden(), status=403, head_only=head_only)
+                self._redirect(f"/login?next={path}")
+            elif _ctx.user["role"] != wanted:
+                msg = urllib.parse.quote("That panel is not available for your account. Showing your own panel.")
+                self._redirect(f"{panel_for(_ctx.user)}?flash={msg}")
             else:
-                self._send_html(render_admin_dashboard(flash_msg=flash), head_only=head_only)
+                self._send_html(render_admin_dashboard(flash_msg=flash, panel=wanted), head_only=head_only)
         elif path == "/up":
             self._send_html(b"OK", head_only=head_only)
         else:
@@ -1900,7 +1939,7 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
             multi_services = parsed_body.get("selected_services", [])
 
         if form_data.get("_csrf", "") != _ctx.session["csrf"]:
-            self._send_html(render_forbidden("Your form session has expired. Please refresh the page and try again."), status=403)
+            self._send_html(render_forbidden("Your form session has expired. Please go back, refresh the page and try again.", title="Session Expired"), status=403)
             return
 
         if path == "/login":
@@ -1922,8 +1961,9 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
             if not can_manage(_ctx.user):
                 self._send_html(render_forbidden(), status=403)
                 return
-            if path == "/admin/update-role" and _ctx.user["role"] != "admin":
-                self._send_html(render_forbidden("Only administrators can change user roles."), status=403)
+            admin_only = path in ("/admin/update-role", "/admin/update-service")
+            if admin_only and _ctx.user["role"] != "admin":
+                self._send_html(render_forbidden("Only administrators can change user roles or website content."), status=403)
                 return
 
         now = datetime.utcnow().strftime("%Y-%m-%d %H:%M")
@@ -2032,7 +2072,7 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
             conn.commit()
             conn.close()
             msg = urllib.parse.quote("Patient service request status updated successfully.")
-            self._redirect(f"/admin?flash={msg}")
+            self._redirect(f"{panel_for(_ctx.user)}?flash={msg}")
 
         elif path == "/admin/update-consultation":
             conn = get_db()
@@ -2047,7 +2087,7 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
             conn.commit()
             conn.close()
             msg = urllib.parse.quote("Telemedicine meeting link and status saved.")
-            self._redirect(f"/admin?flash={msg}")
+            self._redirect(f"{panel_for(_ctx.user)}?flash={msg}")
 
         elif path == "/admin/update-service":
             conn = get_db()
@@ -2063,7 +2103,7 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
             conn.commit()
             conn.close()
             msg = urllib.parse.quote("Service content updated successfully.")
-            self._redirect(f"/admin?flash={msg}")
+            self._redirect(f"{panel_for(_ctx.user)}?flash={msg}")
 
         elif path == "/admin/update-role":
             conn = get_db()
@@ -2074,7 +2114,7 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
             conn.commit()
             conn.close()
             msg = urllib.parse.quote("User role updated successfully.")
-            self._redirect(f"/admin?flash={msg}")
+            self._redirect(f"{panel_for(_ctx.user)}?flash={msg}")
 
         else:
             self._redirect("/")

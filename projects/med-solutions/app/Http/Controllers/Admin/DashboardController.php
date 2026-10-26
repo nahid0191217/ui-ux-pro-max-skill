@@ -22,9 +22,20 @@ class DashboardController extends Controller
     /**
      * Render Admin / Staff Portal Dashboard with KPI metrics, patient leads, telemedicine & CMS.
      */
-    public function index(Request $request): View
+    public function index(): View
     {
-        $statusFilter = $request->query('status');
+        return $this->renderPanel('admin');
+    }
+
+    /** Staff Panel: operational view (leads, visas, telemedicine, inquiries) — no CMS or role management. */
+    public function staffIndex(): View
+    {
+        return $this->renderPanel('staff');
+    }
+
+    private function renderPanel(string $panel): View
+    {
+        $statusFilter = request()->query('status');
 
         $stats = [
             'total_requests' => ServiceRequest::count(),
@@ -52,6 +63,7 @@ class DashboardController extends Controller
         $testimonials = Testimonial::latest()->take(6)->get();
 
         return view('admin.dashboard', compact(
+            'panel',
             'stats',
             'serviceRequests',
             'consultations',

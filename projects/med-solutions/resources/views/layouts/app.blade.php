@@ -75,8 +75,8 @@
             <!-- Authenticated vs Guest Action Buttons -->
             <div class="hidden lg:flex lg:items-center lg:gap-3">
                 @auth
-                    <a href="{{ auth()->user()->canManagePortal() ? route('admin.dashboard') : route('patient.dashboard') }}" class="cursor-pointer rounded-xl border border-cyan-700 px-3.5 py-2 text-xs font-bold text-cyan-900 transition-colors hover:bg-cyan-50">
-                        {{ auth()->user()->canManagePortal() ? 'Admin Panel' : 'My Dashboard' }} ({{ auth()->user()->name }})
+                    <a href="{{ route(auth()->user()->panelRoute()) }}" class="cursor-pointer rounded-xl border border-cyan-700 px-3.5 py-2 text-xs font-bold text-cyan-900 transition-colors hover:bg-cyan-50">
+                        {{ auth()->user()->isAdmin() ? 'Admin Panel' : (auth()->user()->isStaff() ? 'Staff Panel' : 'My Dashboard') }} ({{ auth()->user()->name }})
                     </a>
                     <form action="{{ route('logout') }}" method="POST" class="inline">
                         @csrf
@@ -127,7 +127,7 @@
                 <a href="{{ route('consultations.create') }}" class="rounded-lg px-3 py-2.5 hover:bg-cyan-50">Telemedicine Booking</a>
                 <a href="{{ route('services.track') }}" class="rounded-lg px-3 py-2.5 hover:bg-cyan-50">Track Request</a>
                 @auth
-                    <a href="{{ auth()->user()->canManagePortal() ? route('admin.dashboard') : route('patient.dashboard') }}" class="rounded-lg px-3 py-2.5 text-cyan-800 hover:bg-cyan-50">My Dashboard</a>
+                    <a href="{{ route(auth()->user()->panelRoute()) }}" class="rounded-lg px-3 py-2.5 text-cyan-800 hover:bg-cyan-50">My Dashboard</a>
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button type="submit" class="w-full rounded-lg px-3 py-2.5 text-left text-red-700 hover:bg-red-50">Sign Out</button>

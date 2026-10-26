@@ -44,6 +44,32 @@ class User extends Authenticatable
         return $this->role === UserRole::Staff;
     }
 
+    /** The single panel route each role lands in after sign-in. */
+    public function panelRoute(): string
+    {
+        return match ($this->role) {
+            UserRole::Admin => 'admin.dashboard',
+            UserRole::Staff => 'staff.dashboard',
+            default => 'patient.dashboard',
+        };
+    }
+
+    /** Whether this user may open a given URL path (used to validate a stored "intended" URL). */
+    public function canAccessPath(string $path): bool
+    {
+        if (str_starts_with($path, '/admin')) {
+            return $this->role === UserRole::Admin;
+        }
+        if (str_starts_with($path, '/staff')) {
+            return $this->role === UserRole::Staff;
+        }
+        if (str_starts_with($path, '/patient')) {
+            return $this->role === UserRole::Patient;
+        }
+
+        return true;
+    }
+
     public function canManagePortal(): bool
     {
         return in_array($this->role, [UserRole::Admin, UserRole::Staff], true);
