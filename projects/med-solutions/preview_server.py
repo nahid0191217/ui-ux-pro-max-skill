@@ -772,7 +772,7 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
 
     <footer class="mt-16 border-t border-slate-200 bg-slate-950 text-slate-300">
         <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-            <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+            <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
                 <div>
                     <div class="flex items-center gap-2.5">
                         <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-600 text-white">
@@ -804,14 +804,6 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
                         <li><a href="/service-request?service=treatment_plan" class="hover:text-cyan-400">4. Treatment Plan & Cost Estimate</a></li>
                         <li><a href="/service-request?service=pickup_drop" class="hover:text-cyan-400">5. Airport Pickup & Interpreters</a></li>
                         <li><a href="/service-request?service=accommodation" class="hover:text-cyan-400">6. Hospital-Near Accommodation</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-white">Portal Navigation</h3>
-                    <ul class="mt-3 space-y-2 text-sm text-slate-400">
-                        <li><a href="/track?tracking_code=MS-2026-DEMO1" class="hover:text-cyan-400">Live Status Tracker (Demo)</a></li>
-                        <li><a href="/patient" class="hover:text-cyan-400">Patient Portal Dashboard</a></li>
-                        <li><a href="/login" class="hover:text-cyan-400">Staff / Admin Sign In</a></li>
                     </ul>
                 </div>
                 <div>
