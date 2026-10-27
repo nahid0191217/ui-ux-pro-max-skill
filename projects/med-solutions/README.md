@@ -134,4 +134,4 @@ php artisan serve
 ### Quick Role Switcher (Preview / Demo Only)
 The header contains a **Quick Role Switcher** (Admin / Staff / Patient) that signs you in as a seeded demo account without a password. It is for demonstrations only:
 - Laravel: enabled only when `DEMO_ROLE_SWITCHER=true` **and** `APP_ENV` is not `production` (see `config/demo.php`). The default is `false`.
-- Live preview server: enabled by default; set `DEMO_ROLE_SWITCHER=0` to turn it off.
+- Live preview server: disabled by default (the header switcher is hidden); set `DEMO_ROLE_SWITCHER=1` to show it for demos.

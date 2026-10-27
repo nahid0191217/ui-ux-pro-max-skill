@@ -359,7 +359,7 @@ def svg_icon(name: str) -> str:
 
 
 
-DEMO_ROLE_SWITCHER = os.environ.get("DEMO_ROLE_SWITCHER", "1") == "1"
+DEMO_ROLE_SWITCHER = os.environ.get("DEMO_ROLE_SWITCHER", "0") == "1"  # off by default; set DEMO_ROLE_SWITCHER=1 to show it
 DEMO_ACCOUNTS = {
     "admin": "admin@example.com",
     "staff": "staff@example.com",
