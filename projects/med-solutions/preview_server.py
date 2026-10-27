@@ -1687,6 +1687,7 @@ def render_admin_dashboard(flash_msg: str = "", panel: str = "admin") -> bytes:
 class MedSolutionsHandler(BaseHTTPRequestHandler):
     _token = ""
     _secure = False
+    _had_cookie = False
 
     def _send_cookie(self) -> None:
         # Served inside a cross-site iframe in Arena, so SameSite=Lax cookies are dropped on POST.
@@ -1702,6 +1703,7 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
                 token = jar[SESSION_COOKIE].value
         except Exception:
             token = None
+        self._had_cookie = bool(token)
         with SESSIONS_LOCK:
             data = SESSIONS.get(token) if token else None
             if data is None:
@@ -1939,7 +1941,13 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
             multi_services = parsed_body.get("selected_services", [])
 
         if form_data.get("_csrf", "") != _ctx.session["csrf"]:
-            self._send_html(render_forbidden("Your form session has expired. Please go back, refresh the page and try again.", title="Session Expired"), status=403)
+            if not self._had_cookie:
+                self._send_html(render_forbidden(
+                    "Your browser did not send your session cookie, so the form could not be verified. "
+                    "Open this site in a new browser tab (not inside a frame), allow cookies for it, then try again.",
+                    title="Browser Blocked Cookies"), status=403)
+            else:
+                self._send_html(render_forbidden("Your form session has expired. Please go back, refresh the page and try again.", title="Session Expired"), status=403)
             return
 
         if path == "/login":
