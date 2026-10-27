@@ -7,6 +7,7 @@
     <title>@yield('title', 'Med Solutions | Trusted Bangladesh-to-India Medical Tourism Assistance')</title>
     <meta name="description" content="Med Solutions - End-to-end assistance for Bangladeshi patients travelling to India for specialist appointments, medical visas, telemedicine, airport pickup, and hospital-near accommodation.">
 
+    <link rel="icon" type="image/jpeg" href="{{ asset('images/med-solutions-logo.jpeg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -52,15 +53,7 @@
     <header x-data="{ mobileOpen: false }" class="sticky top-0 z-40 border-b border-cyan-100 bg-white/95 backdrop-blur-md">
         <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8" aria-label="Main Navigation">
             <a href="{{ route('home') }}" class="flex items-center gap-3 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700 rounded-lg">
-                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-800 text-white shadow-sm">
-                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-                        <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <div>
-                    <span class="block font-heading text-xl font-extrabold tracking-tight text-slate-900">Med<span class="text-cyan-700">Solutions</span></span>
-                    <span class="block text-[11px] font-medium text-slate-500">Cross-Border Medical Care</span>
-                </div>
+                <img src="{{ asset('images/med-solutions-logo.jpeg') }}" alt="Med Solutions logo" class="h-14 w-auto sm:h-16">
             </a>
 
             <!-- Desktop Links -->
@@ -163,13 +156,8 @@
         <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
             <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
                 <div>
-                    <div class="flex items-center gap-2.5">
-                        <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-600 text-white">
-                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-                                <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <span class="font-heading text-xl font-bold text-white">Med Solutions</span>
+                    <div class="inline-block rounded-xl bg-white p-2">
+                        <img src="{{ asset('images/med-solutions-logo.jpeg') }}" alt="Med Solutions logo" class="h-16 w-auto">
                     </div>
                     <p class="mt-4 text-sm leading-relaxed text-slate-400">
                         Your trusted medical tourism partner helping Bangladeshi patients access world-class hospitals across India with end-to-end care coordination.

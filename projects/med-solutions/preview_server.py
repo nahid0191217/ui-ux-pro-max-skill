@@ -27,6 +27,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 RUNTIME_DIR = "/tmp/med_solutions_preview"
 UPLOAD_DIR = os.path.join(RUNTIME_DIR, "uploads")
 DB_PATH = os.path.join(RUNTIME_DIR, "med_solutions_v2_auth.sqlite3")
+LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "public", "images", "med-solutions-logo.jpeg")
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
@@ -684,6 +685,7 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{e(title)}</title>
+    <link rel="icon" type="image/jpeg" href="/images/med-solutions-logo.jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -732,15 +734,7 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
     <header class="sticky top-0 z-40 border-b border-cyan-100 bg-white/95 backdrop-blur-md">
         <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8" aria-label="Main Navigation">
             <a href="/" class="flex items-center gap-3 cursor-pointer rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700">
-                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-800 text-white shadow-sm">
-                    <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" aria-hidden="true">
-                        <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <div>
-                    <span class="block font-heading text-xl font-extrabold tracking-tight text-slate-900">Med<span class="text-cyan-700">Solutions</span></span>
-                    <span class="block text-[11px] font-medium text-slate-500">Cross-Border Medical Care</span>
-                </div>
+                <img src="/images/med-solutions-logo.jpeg" alt="Med Solutions logo" class="h-14 w-auto sm:h-16">
             </a>
 
             <div class="hidden lg:flex lg:items-center lg:gap-6 text-sm">
@@ -774,11 +768,8 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
         <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
             <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
                 <div>
-                    <div class="flex items-center gap-2.5">
-                        <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-600 text-white">
-                            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
-                        </div>
-                        <span class="font-heading text-xl font-bold text-white">Med Solutions</span>
+                    <div class="inline-block rounded-xl bg-white p-2">
+                        <img src="/images/med-solutions-logo.jpeg" alt="Med Solutions logo" class="h-16 w-auto">
                     </div>
                     <p class="mt-4 text-sm leading-relaxed text-slate-400">
                         Your trusted cross-border healthcare partner assisting Bangladeshi patients with specialist appointments, Indian medical visas, telemedicine, airport pickup, and hospital-near stays.
@@ -1817,6 +1808,17 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
         if not head_only:
             self.wfile.write(content)
 
+    def _send_file(self, file_path: str, content_type: str, head_only: bool = False) -> None:
+        with open(file_path, "rb") as fh:
+            data = fh.read()
+        self.send_response(200)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "public, max-age=3600")
+        self.end_headers()
+        if not head_only:
+            self.wfile.write(data)
+
     def _redirect(self, location: str) -> None:
         self.send_response(303)
         self.send_header("Location", location)
@@ -1884,6 +1886,8 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
                 self._redirect(f"{panel_for(_ctx.user)}?flash={msg}")
             else:
                 self._send_html(render_admin_dashboard(flash_msg=flash, panel=wanted), head_only=head_only)
+        elif path == "/images/med-solutions-logo.jpeg":
+            self._send_file(LOGO_PATH, "image/jpeg", head_only=head_only)
         elif path == "/up":
             self._send_html(b"OK", head_only=head_only)
         else:
