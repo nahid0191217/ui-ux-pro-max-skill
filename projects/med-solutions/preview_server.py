@@ -833,6 +833,12 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
     </header>
 
     {announce_html}
+    <div id="frame-notice" class="hidden border-b border-amber-300 bg-amber-50 text-amber-950 text-sm">
+        <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
+            <span class="font-semibold">You are viewing this page inside a preview frame. Browsers often block the sign-in cookie here, so sign-in can fail. Open the site in a new tab to sign in.</span>
+            <a id="frame-open" href="/login" target="_blank" rel="noopener" class="btn-brand shrink-0 cursor-pointer rounded-lg px-3.5 py-1.5 text-xs font-bold text-white">Open in New Tab</a>
+        </div>
+    </div>
     {flash_html}
 
     <main id="main-content">
@@ -878,6 +884,13 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
             </div>
         </div>
     </footer>
+    <script>
+        var onAuthPage = window.location.pathname.indexOf('/login') === 0 || window.location.pathname.indexOf('/register') === 0;
+        if (window.top !== window.self && onAuthPage) {{
+            document.getElementById('frame-notice').classList.remove('hidden');
+            document.getElementById('frame-open').href = window.location.href;
+        }}
+    </script>
 </body>
 </html>"""
     return _inject_csrf(page).encode("utf-8")
