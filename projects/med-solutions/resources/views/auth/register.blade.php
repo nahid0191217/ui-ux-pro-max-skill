@@ -26,21 +26,21 @@
                 <div>
                     <label for="field-name" class="block text-sm font-semibold text-slate-800">Full Name (As on Passport) <span class="text-red-600">*</span></label>
                     <input id="field-name" name="name" type="text" value="{{ old('name') }}" required
-                           class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-700/20">
+                           class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/20">
                     @error('name') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
                     <label for="field-phone" class="block text-sm font-semibold text-slate-800">Mobile / WhatsApp Number <span class="text-red-600">*</span></label>
                     <input id="field-phone" name="phone" type="tel" value="{{ old('phone') }}" placeholder="017XXXXXXXX" required
-                           class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-700/20">
+                           class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/20">
                     @error('phone') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror
                 </div>
 
                 <div>
                     <label for="field-email" class="block text-sm font-semibold text-slate-800">Email Address <span class="text-red-600">*</span></label>
                     <input id="field-email" name="email" type="email" value="{{ old('email') }}" required
-                           class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-700/20">
+                           class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/20">
                     @error('email') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror
                 </div>
 
@@ -48,20 +48,20 @@
                     <div>
                         <label for="field-password" class="block text-sm font-semibold text-slate-800">Password <span class="text-red-600">*</span></label>
                         <input id="field-password" name="password" type="password" autocomplete="new-password" required
-                               class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-700/20">
+                               class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/20">
                         @error('password') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
                         <label for="field-password_confirmation" class="block text-sm font-semibold text-slate-800">Confirm Password <span class="text-red-600">*</span></label>
                         <input id="field-password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required
-                               class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-700/20">
+                               class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/20">
                     </div>
                 </div>
 
                 <button
                     type="submit"
-                    class="mt-2 w-full cursor-pointer rounded-xl bg-emerald-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2"
+                    class="mt-2 w-full cursor-pointer rounded-xl btn-brand px-5 py-3 text-sm font-bold text-white shadow-sm transition  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2"
                 >
                     Create Patient Account
                 </button>
@@ -69,7 +69,7 @@
 
             <p class="mt-6 border-t border-slate-100 pt-5 text-center text-xs text-slate-600">
                 Already have an account?
-                <a href="{{ route('login') }}" class="font-bold text-cyan-800 underline hover:text-emerald-700">Sign In</a>
+                <a href="{{ route('login') }}" class="font-bold text-brand-800 underline hover:text-emerald-700">Sign In</a>
             </p>
         </div>
     </div>

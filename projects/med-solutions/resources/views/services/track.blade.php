@@ -21,7 +21,7 @@
                         value="{{ $trackingCode }}"
                         placeholder="Tracking Code (e.g. MS-2026-XXXXX)"
                         required
-                        class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm font-medium uppercase focus:border-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-700/20"
+                        class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm font-medium uppercase focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/20"
                     >
                 </div>
                 <div class="sm:col-span-5">
@@ -33,11 +33,11 @@
                         value="{{ $phoneInput ?? '' }}"
                         placeholder="Registered Phone Number"
                         @guest required @endguest
-                        class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-700/20"
+                        class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/20"
                     >
                 </div>
                 <div class="sm:col-span-2">
-                    <button type="submit" class="w-full cursor-pointer rounded-xl bg-cyan-800 px-5 py-3 text-sm font-bold text-white hover:bg-cyan-900">
+                    <button type="submit" class="w-full cursor-pointer rounded-xl bg-brand-800 px-5 py-3 text-sm font-bold text-white hover:bg-brand-900">
                         Verify
                     </button>
                 </div>
@@ -63,7 +63,7 @@
                     <div class="flex flex-wrap items-center justify-between gap-4">
                         <div>
                             <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Tracking Code</span>
-                            <h2 class="font-heading text-xl font-extrabold text-cyan-900">{{ $serviceRequest->tracking_code }}</h2>
+                            <h2 class="font-heading text-xl font-extrabold text-brand-900">{{ $serviceRequest->tracking_code }}</h2>
                             <p class="text-sm text-slate-600">Patient: <strong>{{ $serviceRequest->patient_name }}</strong></p>
                         </div>
                         <x-status-badge :status="$serviceRequest->status" />

@@ -6,7 +6,7 @@
 <section class="py-12 sm:py-16">
     <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <div class="mb-8 text-center">
-            <span class="inline-block rounded-full bg-cyan-50 px-3.5 py-1 text-xs font-bold text-cyan-900 ring-1 ring-cyan-200">
+            <span class="inline-block rounded-full bg-brand-50 px-3.5 py-1 text-xs font-bold text-brand-900 ring-1 ring-brand-200">
                 Online Patient Assistance Booking
             </span>
             <h1 class="mt-3 font-heading text-2xl font-extrabold text-slate-900 sm:text-3xl">
@@ -45,7 +45,7 @@
                             value="{{ old('patient_name', auth()->user()?->name) }}"
                             placeholder="e.g. Md. Kamrul Islam"
                             @error('patient_name') aria-invalid="true" aria-describedby="error-patient_name" @enderror
-                            class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-700/20"
+                            class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/20"
                         >
                         @error('patient_name')
                             <p id="error-patient_name" class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>
@@ -64,7 +64,7 @@
                             value="{{ old('phone', auth()->user()?->phone) }}"
                             placeholder="017XXXXXXXX"
                             @error('phone') aria-invalid="true" aria-describedby="error-phone" @enderror
-                            class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-700/20"
+                            class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/20"
                         >
                         @error('phone')
                             <p id="error-phone" class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>
@@ -82,7 +82,7 @@
                             value="{{ old('email', auth()->user()?->email) }}"
                             placeholder="patient@example.com"
                             @error('email') aria-invalid="true" aria-describedby="error-email" @enderror
-                            class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-700/20"
+                            class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/20"
                         >
                         @error('email')
                             <p id="error-email" class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>
@@ -104,13 +104,13 @@
 
                 <div class="mt-4 grid gap-3 sm:grid-cols-2">
                     @foreach ($serviceLabels as $value => $label)
-                        <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-3.5 transition hover:border-cyan-500 hover:bg-cyan-50/40 has-[:checked]:border-cyan-700 has-[:checked]:bg-cyan-50/70">
+                        <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-3.5 transition hover:border-accent-500 hover:bg-brand-50/40 has-[:checked]:border-brand-700 has-[:checked]:bg-brand-50/70">
                             <input
                                 type="checkbox"
                                 name="selected_services[]"
                                 value="{{ $value }}"
                                 @checked(in_array($value, (array) $checkedServices, true))
-                                class="mt-0.5 h-4 w-4 rounded border-slate-300 text-cyan-800 focus:ring-cyan-700"
+                                class="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-800 focus:ring-brand-700"
                             >
                             <span class="text-sm font-semibold text-slate-800">{{ $label }}</span>
                         </label>
@@ -133,7 +133,7 @@
                         <select
                             id="field-preferred_hospital"
                             name="preferred_hospital"
-                            class="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-700/20"
+                            class="mt-1.5 w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/20"
                         >
                             <option value="">Recommend the Best Hospital Based on My Reports</option>
                             @foreach ($partnerHospitals as $hospital)
@@ -154,7 +154,7 @@
                             type="text"
                             value="{{ old('preferred_doctor') }}"
                             placeholder="e.g. Dr. Devi Shetty / Cardiology / Oncology"
-                            class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-700/20"
+                            class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/20"
                         >
                     </div>
                 </div>
@@ -166,9 +166,9 @@
                     </label>
                     <label
                         for="field-medical_report"
-                        class="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-cyan-300 bg-cyan-50/40 px-6 py-7 text-center transition hover:border-cyan-600 hover:bg-cyan-50"
+                        class="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-accent-300 bg-brand-50/40 px-6 py-7 text-center transition hover:border-brand-600 hover:bg-brand-50"
                     >
-                        <svg class="h-9 w-9 text-cyan-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <svg class="h-9 w-9 text-brand-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
                         </svg>
                         <span class="mt-2 text-sm font-semibold text-slate-800" x-text="fileName || 'Click here to select a medical report file'">
@@ -200,7 +200,7 @@
                         name="details"
                         rows="4"
                         placeholder="Share patient age, current symptoms, number of accompanying attendants, wheelchair pickup needs, or kitchen accommodation preferences..."
-                        class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-700/20"
+                        class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/20"
                     >{{ old('details') }}</textarea>
                 </div>
             </div>
@@ -211,7 +211,7 @@
                 </p>
                 <button
                     type="submit"
-                    class="cursor-pointer inline-flex items-center gap-2 rounded-xl bg-emerald-700 px-7 py-3.5 text-sm font-bold text-white shadow-md transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2"
+                    class="cursor-pointer inline-flex items-center gap-2 rounded-xl btn-brand px-7 py-3.5 text-sm font-bold text-white shadow-md transition  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2"
                 >
                     <span>Submit Service Request</span>
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">

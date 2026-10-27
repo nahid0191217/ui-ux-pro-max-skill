@@ -10,7 +10,7 @@
 <article class="med-card group relative flex flex-col justify-between p-6">
     <div>
         <div class="mb-5 flex items-center justify-between">
-            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-50 text-cyan-800 ring-1 ring-cyan-200 transition-colors duration-200 group-hover:bg-cyan-700 group-hover:text-white">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-800 ring-1 ring-brand-200 transition-colors duration-200 group-hover:bg-brand-700 group-hover:text-white">
                 @switch($icon)
                     @case('calendar-check')
                         <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -61,7 +61,7 @@
             {{ $title }}
         </h3>
         @if($subtitle)
-            <p class="mt-0.5 text-xs font-semibold uppercase tracking-wider text-cyan-800">
+            <p class="mt-0.5 text-xs font-semibold uppercase tracking-wider text-brand-800">
                 {{ $subtitle }}
             </p>
         @endif
@@ -74,7 +74,7 @@
     <div class="mt-6 border-t border-slate-100 pt-4">
         <a
             href="{{ $slug === 'telemedicine' ? route('consultations.create') : route('services.create', ['service' => $slug]) }}"
-            class="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-cyan-800 transition-colors duration-200 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700 focus-visible:ring-offset-2 rounded"
+            class="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-brand-800 transition-colors duration-200 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2 rounded"
         >
             <span>Request This Service</span>
             <svg class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">

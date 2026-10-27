@@ -38,6 +38,34 @@ def get_db() -> sqlite3.Connection:
     return conn
 
 
+SETTING_DEFAULTS = {
+    "brand_name": "Med Solutions",
+    "brand_tagline": "Cross-Border Medical Care",
+    "announcement": "",
+    "helpline_phone": "+880 XXXX-XXXXXX",
+    "support_email": "support@example.com",
+    "office_address": "[add your office address]",
+    "hero_badge": "Bangladesh\u2019s Trusted Partner for Medical Treatment in India",
+    "hero_title": "Your Right Decision Ensures",
+    "hero_highlight": "Your Best Medical Treatment",
+    "footer_about": "Your trusted cross-border healthcare partner assisting Bangladeshi patients with specialist appointments, Indian medical visas, telemedicine, airport pickup, and hospital-near stays.",
+    "social_facebook": "https://facebook.com",
+    "social_youtube": "https://youtube.com",
+    "social_linkedin": "https://linkedin.com",
+}
+
+
+def get_settings() -> dict:
+    conn = get_db()
+    rows = conn.execute("SELECT key, value FROM site_settings").fetchall()
+    conn.close()
+    cfg = dict(SETTING_DEFAULTS)
+    for row in rows:
+        if row["key"] in cfg:
+            cfg[row["key"]] = row["value"]
+    return cfg
+
+
 def init_db() -> None:
     conn = get_db()
     cur = conn.cursor()
@@ -111,6 +139,11 @@ def init_db() -> None:
             message TEXT NOT NULL,
             is_read INTEGER NOT NULL DEFAULT 0,
             created_at TEXT NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS site_settings (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL DEFAULT ''
         );
 
         CREATE TABLE IF NOT EXISTS testimonials (
@@ -192,6 +225,7 @@ def init_db() -> None:
             ],
         )
 
+    cur.executemany("INSERT OR IGNORE INTO site_settings (key, value) VALUES (?, ?)", list(SETTING_DEFAULTS.items()))
     if cur.execute("SELECT COUNT(*) FROM testimonials").fetchone()[0] == 0:
         cur.executemany(
             "INSERT INTO testimonials (patient_name, district, hospital_treated, quote, rating) VALUES (?, ?, ?, ?, ?)",
@@ -328,15 +362,15 @@ SERVICE_NAMES = {
 def render_badge(status: str) -> str:
     labels = {
         "pending": ("Pending", "bg-amber-50 text-amber-900 ring-amber-600/30", "bg-amber-600"),
-        "processing": ("Processing", "bg-cyan-50 text-cyan-900 ring-cyan-600/30", "bg-cyan-600"),
+        "processing": ("Processing", "bg-brand-50 text-brand-900 ring-brand-600/30", "bg-brand-600"),
         "confirmed": ("Confirmed", "bg-emerald-50 text-emerald-900 ring-emerald-600/30", "bg-emerald-600"),
         "scheduled": ("Scheduled", "bg-emerald-50 text-emerald-900 ring-emerald-600/30", "bg-emerald-600"),
         "completed": ("Completed", "bg-emerald-50 text-emerald-900 ring-emerald-600/30", "bg-emerald-600"),
         "cancelled": ("Cancelled", "bg-red-50 text-red-900 ring-red-600/30", "bg-red-600"),
         "approved": ("Visa Approved", "bg-emerald-50 text-emerald-900 ring-emerald-600/30", "bg-emerald-600"),
-        "vil_issued": ("VIL Issued", "bg-cyan-50 text-cyan-900 ring-cyan-600/30", "bg-cyan-600"),
+        "vil_issued": ("VIL Issued", "bg-brand-50 text-brand-900 ring-brand-600/30", "bg-brand-600"),
         "documents_received": ("Docs Received", "bg-amber-50 text-amber-900 ring-amber-600/30", "bg-amber-600"),
-        "ivac_submitted": ("IVAC Submitted", "bg-cyan-50 text-cyan-900 ring-cyan-600/30", "bg-cyan-600"),
+        "ivac_submitted": ("IVAC Submitted", "bg-brand-50 text-brand-900 ring-brand-600/30", "bg-brand-600"),
         "slot_confirmed": ("Slot Confirmed", "bg-emerald-50 text-emerald-900 ring-emerald-600/30", "bg-emerald-600"),
         "requested": ("Requested", "bg-amber-50 text-amber-900 ring-amber-600/30", "bg-amber-600"),
         "not_requested": ("Not Applicable", "bg-slate-100 text-slate-700 ring-slate-500/20", "bg-slate-400"),
@@ -511,7 +545,7 @@ def render_forbidden(message: str = "This area is restricted to authorized Med S
                 <p class="mt-3 text-sm text-slate-600">{e(message)}</p>
                 <div class="mt-6 flex justify-center gap-3">
                     <a href="/" class="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50">Back to Home</a>
-                    <a href="/login" class="rounded-xl bg-cyan-800 px-4 py-2.5 text-sm font-bold text-white hover:bg-cyan-900">Sign In</a>
+                    <a href="/login" class="rounded-xl bg-brand-800 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-900">Sign In</a>
                 </div>
             </div>
         </div>
@@ -543,16 +577,16 @@ def render_login(email: str = "", next_url: str = "", error_msg: str = "") -> by
                     <input type="hidden" name="next" value="{e(next_url)}">
                     <div>
                         <label for="login-email" class="block text-sm font-semibold text-slate-800">Email Address <span class="text-red-600">*</span></label>
-                        <input id="login-email" name="email" type="email" autocomplete="email" value="{e(email)}" required class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-700/20">
+                        <input id="login-email" name="email" type="email" autocomplete="email" value="{e(email)}" required class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/20">
                     </div>
                     <div>
                         <label for="login-password" class="block text-sm font-semibold text-slate-800">Password <span class="text-red-600">*</span></label>
-                        <input id="login-password" name="password" type="password" autocomplete="current-password" required class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-700/20">
+                        <input id="login-password" name="password" type="password" autocomplete="current-password" required class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/20">
                     </div>
-                    <button type="submit" class="w-full cursor-pointer rounded-xl bg-cyan-800 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-900">Sign In Securely</button>
+                    <button type="submit" class="w-full cursor-pointer rounded-xl bg-brand-800 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-brand-900">Sign In Securely</button>
                 </form>
                 <p class="mt-6 border-t border-slate-100 pt-5 text-center text-xs text-slate-600">
-                    Don’t have a patient account yet? <a href="/register" class="font-bold text-cyan-800 underline hover:text-emerald-700">Create an account</a>
+                    Don’t have a patient account yet? <a href="/register" class="font-bold text-brand-800 underline hover:text-emerald-700">Create an account</a>
                 </p>
                 {demo_box}
             </div>
@@ -562,7 +596,7 @@ def render_login(email: str = "", next_url: str = "", error_msg: str = "") -> by
 
 
 def render_register(name: str = "", phone: str = "", email: str = "", error_msg: str = "") -> bytes:
-    field = "w-full mt-1.5 rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-700/20"
+    field = "w-full mt-1.5 rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/20"
     body = f"""
     <section class="py-12 sm:py-16">
         <div class="mx-auto max-w-lg px-4 sm:px-6">
@@ -595,10 +629,10 @@ def render_register(name: str = "", phone: str = "", email: str = "", error_msg:
                         </div>
                     </div>
                     <p class="text-xs text-slate-500">At least 8 characters, including letters and numbers.</p>
-                    <button type="submit" class="w-full cursor-pointer rounded-xl bg-emerald-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-800">Create Patient Account</button>
+                    <button type="submit" class="w-full cursor-pointer rounded-xl btn-brand px-5 py-3 text-sm font-bold text-white shadow-sm transition ">Create Patient Account</button>
                 </form>
                 <p class="mt-6 border-t border-slate-100 pt-5 text-center text-xs text-slate-600">
-                    Already have an account? <a href="/login" class="font-bold text-cyan-800 underline hover:text-emerald-700">Sign In</a>
+                    Already have an account? <a href="/login" class="font-bold text-brand-800 underline hover:text-emerald-700">Sign In</a>
                 </p>
             </div>
         </div>
@@ -629,13 +663,31 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
             </div>
         </div>"""
 
+    cfg = get_settings()
+    brand_name = cfg["brand_name"]
+    brand_tagline = cfg["brand_tagline"]
+    helpline = cfg["helpline_phone"]
+    support_email = cfg["support_email"]
+    office_address = cfg["office_address"]
+    footer_about = cfg["footer_about"]
+    social_fb = cfg["social_facebook"]
+    social_yt = cfg["social_youtube"]
+    social_li = cfg["social_linkedin"]
+    announce_html = ""
+    if cfg["announcement"].strip():
+        announce_text = e(cfg["announcement"])
+        announce_html = (
+            '<div class="bg-gradient-to-r from-brand-900 via-brand-700 to-accent-600 text-center text-xs font-semibold text-white sm:text-sm">'
+            '<div class="mx-auto max-w-7xl px-4 py-2.5 sm:px-6 lg:px-8">' + announce_text + "</div></div>"
+        )
+
     user = getattr(_ctx, "user", None)
     switcher_html = ""
     if DEMO_ROLE_SWITCHER:
         role_buttons = []
         for role_key, role_label, active_cls in (
             ("admin", "Admin", "bg-amber-500 text-slate-950"),
-            ("staff", "Staff", "bg-cyan-600 text-white"),
+            ("staff", "Staff", "bg-brand-600 text-white"),
             ("patient", "Patient", "bg-emerald-700 text-white"),
         ):
             is_active = user is not None and user["role"] == role_key
@@ -661,15 +713,15 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
         else:
             acct_html = '<a href="/patient" class="hidden sm:inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50">My Portal</a>'
     else:
-        account_html = '<a href="/login" class="cursor-pointer rounded-md px-2.5 py-1 font-semibold text-cyan-300 hover:text-cyan-200">Sign In</a>'
+        account_html = '<a href="/login" class="cursor-pointer rounded-md px-2.5 py-1 font-semibold text-accent-300 hover:text-brand-200">Sign In</a>'
         acct_html = (
             '<a href="/login" class="hidden sm:inline-flex cursor-pointer items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-100">Sign In</a>'
-            '<a href="/register" class="hidden sm:inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-cyan-700 px-3.5 py-2 text-xs font-bold text-cyan-800 transition hover:bg-cyan-50">Register</a>'
+            '<a href="/register" class="hidden sm:inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-brand-700 px-3.5 py-2 text-xs font-bold text-brand-800 transition hover:bg-brand-50">Register</a>'
         )
     topbar_html = (
         '<div class="bg-slate-900 text-slate-100 text-xs"><div class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-2 sm:px-6 lg:px-8">'
         '<div class="flex flex-wrap items-center gap-3">'
-        '<span class="inline-flex items-center gap-1.5 font-semibold text-cyan-300">24/7 Helpline: +880 XXXX-XXXXXX</span>'
+        '<span class="inline-flex items-center gap-1.5 font-semibold text-accent-300">24/7 Helpline: ' + e(helpline) + '</span>'
         '<span class="hidden sm:inline text-slate-500">|</span>'
         '<span class="hidden sm:inline text-slate-300">Bangladesh → India Medical Care</span></div>'
         '<div class="flex flex-wrap items-center gap-3">' + switcher_html + account_html + "</div>"
@@ -677,7 +729,7 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
     )
 
     def nav_cls(p: str) -> str:
-        return "text-cyan-800 font-bold" if active_path == p else "text-slate-700 hover:text-cyan-800 font-semibold"
+        return "text-brand-800 font-bold" if active_path == p else "text-slate-700 hover:text-brand-800 font-semibold"
 
     page = f"""<!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
@@ -694,6 +746,7 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
         tailwind.config = {{
             theme: {{
                 extend: {{
+                    colors: {BRAND_PALETTE_JS},
                     fontFamily: {{
                         sans: ['Noto Sans', 'Figtree', 'sans-serif'],
                         heading: ['Figtree', 'Noto Sans', 'sans-serif'],
@@ -705,14 +758,31 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
     <style>
         .med-card {{
             background: #FFFFFF;
-            border: 1px solid #CFFAFE;
+            border: 1px solid #D9E2FA;
             border-radius: 1rem;
-            box-shadow: 0 6px 20px -4px rgba(8, 145, 178, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+            box-shadow: 0 6px 20px -4px rgba(36, 48, 144, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
             transition: box-shadow 200ms ease, border-color 200ms ease;
         }}
         .med-card:hover {{
-            border-color: #67E8F9;
-            box-shadow: 0 12px 28px -6px rgba(8, 145, 178, 0.14), 0 4px 10px -2px rgba(15, 23, 42, 0.06);
+            border-color: #98AEE3;
+            box-shadow: 0 12px 28px -6px rgba(36, 48, 144, 0.14), 0 4px 10px -2px rgba(15, 23, 42, 0.06);
+        }}
+        .btn-brand {{
+            background: linear-gradient(120deg, #1E2770 0%, #243090 45%, #2D6CAE 100%);
+            color: #FFFFFF;
+            box-shadow: 0 10px 24px -10px rgba(36, 48, 144, 0.6);
+            transition: transform 200ms ease, box-shadow 200ms ease, filter 200ms ease;
+        }}
+        .btn-brand:hover {{
+            transform: translateY(-1px);
+            box-shadow: 0 14px 28px -10px rgba(36, 48, 144, 0.7);
+            filter: brightness(1.06);
+        }}
+        .text-gradient {{
+            background: linear-gradient(120deg, #243090 0%, #60A8D8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }}
         @media (prefers-reduced-motion: reduce) {{
             html {{ scroll-behavior: auto; }}
@@ -723,18 +793,22 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
         }}
     </style>
 </head>
-<body class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased selection:bg-cyan-100 selection:text-cyan-950">
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-cyan-800 focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold text-white">
+<body class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased selection:bg-brand-100 selection:text-brand-950">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-brand-800 focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold text-white">
         Skip to main content
     </a>
 
     {topbar_html}
 
     <!-- Main Navbar -->
-    <header class="sticky top-0 z-40 border-b border-cyan-100 bg-white/95 backdrop-blur-md">
+    <header class="sticky top-0 z-40 border-b border-brand-100 bg-white/95 backdrop-blur-md">
         <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8" aria-label="Main Navigation">
-            <a href="/" class="flex items-center gap-3 cursor-pointer rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-700">
-                <img src="/images/med-solutions-logo.jpeg" alt="Med Solutions logo" class="h-14 w-auto sm:h-16">
+            <a href="/" class="flex items-center gap-3 cursor-pointer rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700">
+                <img src="/images/med-solutions-logo.jpeg" alt="{e(brand_name)} logo" class="h-12 w-auto sm:h-14">
+                <div class="hidden sm:block leading-tight">
+                    <span class="block font-heading text-lg font-extrabold tracking-tight text-brand-900">{e(brand_name)}</span>
+                    <span class="block text-[11px] font-semibold uppercase tracking-widest text-accent-600">{e(brand_tagline)}</span>
+                </div>
             </a>
 
             <div class="hidden lg:flex lg:items-center lg:gap-6 text-sm">
@@ -743,12 +817,12 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
                 <a href="/#pre-travel-guide" class="cursor-pointer transition-colors {nav_cls('/guide')}">Pre-Travel Guide</a>
                 <a href="/telemedicine" class="cursor-pointer transition-colors {nav_cls('/telemedicine')}">Telemedicine</a>
                 <a href="/track" class="cursor-pointer transition-colors {nav_cls('/track')}">Track Status</a>
-                <a href="/#contact" class="cursor-pointer transition-colors text-slate-700 hover:text-cyan-800 font-semibold">Contact</a>
+                <a href="/#contact" class="cursor-pointer transition-colors text-slate-700 hover:text-brand-800 font-semibold">Contact</a>
             </div>
 
             <div class="flex items-center gap-2.5">
                 {acct_html}
-                <a href="/service-request" class="cursor-pointer inline-flex items-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-xs sm:text-sm font-bold text-white shadow-sm transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2">
+                <a href="/service-request" class="cursor-pointer inline-flex items-center gap-2 rounded-xl btn-brand px-4 py-2.5 text-xs sm:text-sm font-bold text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2">
                     <span>Request Assistance</span>
                     <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -758,6 +832,7 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
         </nav>
     </header>
 
+    {announce_html}
     {flash_html}
 
     <main id="main-content">
@@ -768,20 +843,26 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
         <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
             <div class="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
                 <div>
-                    <div class="inline-block rounded-xl bg-white p-2">
-                        <img src="/images/med-solutions-logo.jpeg" alt="Med Solutions logo" class="h-16 w-auto">
+                    <div class="flex items-center gap-4">
+                        <div class="inline-block rounded-xl bg-white p-2">
+                            <img src="/images/med-solutions-logo.jpeg" alt="{e(brand_name)} logo" class="h-16 w-auto">
+                        </div>
+                        <div>
+                            <span class="block font-heading text-xl font-extrabold text-white">{e(brand_name)}</span>
+                            <span class="block text-xs font-semibold uppercase tracking-widest text-accent-300">{e(brand_tagline)}</span>
+                        </div>
                     </div>
                     <p class="mt-4 text-sm leading-relaxed text-slate-400">
-                        Your trusted cross-border healthcare partner assisting Bangladeshi patients with specialist appointments, Indian medical visas, telemedicine, airport pickup, and hospital-near stays.
+                        {e(footer_about)}
                     </p>
                     <div class="mt-5 flex items-center gap-3">
-                        <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook Page" class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg bg-slate-900 text-slate-300 ring-1 ring-slate-800 transition hover:bg-cyan-700 hover:text-white">
+                        <a href="{e(social_fb)}" target="_blank" rel="noopener" aria-label="Facebook Page" class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg bg-slate-900 text-slate-300 ring-1 ring-slate-800 transition hover:bg-brand-700 hover:text-white">
                             <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"/></svg>
                         </a>
-                        <a href="https://youtube.com" target="_blank" rel="noopener" aria-label="YouTube Channel" class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg bg-slate-900 text-slate-300 ring-1 ring-slate-800 transition hover:bg-cyan-700 hover:text-white">
+                        <a href="{e(social_yt)}" target="_blank" rel="noopener" aria-label="YouTube Channel" class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg bg-slate-900 text-slate-300 ring-1 ring-slate-800 transition hover:bg-brand-700 hover:text-white">
                             <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.58 7.19a2.51 2.51 0 0 0-1.77-1.77C18.25 5 12 5 12 5s-6.25 0-7.81.42c-.86.23-1.54.91-1.77 1.77C2 8.75 2 12 2 12s0 3.25.42 4.81c.23.86.91 1.54 1.77 1.77C5.75 19 12 19 12 19s6.25 0 7.81-.42a2.51 2.51 0 0 0 1.77-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81zM10 15V9l5.2 3-5.2 3z"/></svg>
                         </a>
-                        <a href="https://linkedin.com" target="_blank" rel="noopener" aria-label="LinkedIn Profile" class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg bg-slate-900 text-slate-300 ring-1 ring-slate-800 transition hover:bg-cyan-700 hover:text-white">
+                        <a href="{e(social_li)}" target="_blank" rel="noopener" aria-label="LinkedIn Profile" class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg bg-slate-900 text-slate-300 ring-1 ring-slate-800 transition hover:bg-brand-700 hover:text-white">
                             <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
                         </a>
                     </div>
@@ -789,18 +870,18 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
                 <div>
                     <h3 class="text-sm font-bold uppercase tracking-wider text-white">6 Core Services</h3>
                     <ul class="mt-3 space-y-2 text-sm text-slate-400">
-                        <li><a href="/service-request?service=appointment" class="hover:text-cyan-400">1. Specialist Doctor Appointments</a></li>
-                        <li><a href="/service-request?service=visa_processing" class="hover:text-cyan-400">2. Visa Processing, VIL & Tickets</a></li>
-                        <li><a href="/telemedicine" class="hover:text-cyan-400">3. Telemedicine Video Consults</a></li>
-                        <li><a href="/service-request?service=treatment_plan" class="hover:text-cyan-400">4. Treatment Plan & Cost Estimate</a></li>
-                        <li><a href="/service-request?service=pickup_drop" class="hover:text-cyan-400">5. Airport Pickup & Interpreters</a></li>
-                        <li><a href="/service-request?service=accommodation" class="hover:text-cyan-400">6. Hospital-Near Accommodation</a></li>
+                        <li><a href="/service-request?service=appointment" class="hover:text-accent-400">1. Specialist Doctor Appointments</a></li>
+                        <li><a href="/service-request?service=visa_processing" class="hover:text-accent-400">2. Visa Processing, VIL & Tickets</a></li>
+                        <li><a href="/telemedicine" class="hover:text-accent-400">3. Telemedicine Video Consults</a></li>
+                        <li><a href="/service-request?service=treatment_plan" class="hover:text-accent-400">4. Treatment Plan & Cost Estimate</a></li>
+                        <li><a href="/service-request?service=pickup_drop" class="hover:text-accent-400">5. Airport Pickup & Interpreters</a></li>
+                        <li><a href="/service-request?service=accommodation" class="hover:text-accent-400">6. Hospital-Near Accommodation</a></li>
                     </ul>
                 </div>
                 <div>
                     <h3 class="text-sm font-bold uppercase tracking-wider text-white">Contact Us</h3>
-                    <p class="mt-3 text-sm text-slate-400">Office address: [add your office address]</p>
-                    <p class="mt-2 text-sm text-cyan-400 font-semibold">+880 XXXX-XXXXXX • support@example.com</p>
+                    <p class="mt-3 text-sm text-slate-400">Office address: {e(office_address)}</p>
+                    <p class="mt-2 text-sm text-accent-400 font-semibold">{e(helpline)} • {e(support_email)}</p>
                 </div>
             </div>
             <div class="mt-10 border-t border-slate-800 pt-6 text-center text-xs text-slate-500">
@@ -814,6 +895,12 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
 
 
 def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
+    cfg = get_settings()
+    hero_badge = cfg["hero_badge"]
+    hero_title = cfg["hero_title"]
+    hero_highlight = cfg["hero_highlight"]
+    helpline = cfg["helpline_phone"]
+    support_email = cfg["support_email"]
     conn = get_db()
     services = conn.execute("SELECT * FROM services WHERE is_active = 1 ORDER BY sort_order").fetchall()
     testimonials = conn.execute("SELECT * FROM testimonials ORDER BY id DESC").fetchall()
@@ -827,17 +914,17 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
         <article class="med-card group flex flex-col justify-between p-6">
             <div>
                 <div class="mb-5 flex items-center justify-between">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-50 text-cyan-800 ring-1 ring-cyan-200 transition-colors duration-200 group-hover:bg-cyan-700 group-hover:text-white">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-800 ring-1 ring-brand-200 transition-colors duration-200 group-hover:bg-brand-700 group-hover:text-white">
                         {svg_icon(svc["icon_name"])}
                     </div>
                     <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600">Service #{num}</span>
                 </div>
                 <h3 class="font-heading text-xl font-bold text-slate-900">{e(svc["title"])}</h3>
-                <p class="mt-0.5 text-xs font-semibold uppercase tracking-wider text-cyan-800">{e(svc["subtitle"])}</p>
+                <p class="mt-0.5 text-xs font-semibold uppercase tracking-wider text-brand-800">{e(svc["subtitle"])}</p>
                 <p class="mt-3 text-sm leading-relaxed text-slate-600">{e(svc["description"])}</p>
             </div>
             <div class="mt-6 border-t border-slate-100 pt-4">
-                <a href="{link}" class="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-cyan-800 transition-colors hover:text-emerald-700">
+                <a href="{link}" class="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-brand-800 transition-colors hover:text-emerald-700">
                     <span>Request This Service</span>
                     <svg class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </a>
@@ -853,7 +940,7 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
     ]
     steps_html = "".join(
         f"""<div class="med-card flex flex-col p-6">
-                <span class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-800 font-heading text-base font-extrabold text-white">{s[0]}</span>
+                <span class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-800 font-heading text-base font-extrabold text-white">{s[0]}</span>
                 <h3 class="mt-4 font-heading text-lg font-bold text-slate-900">{s[1]}</h3>
                 <p class="mt-2.5 text-sm leading-relaxed text-slate-600">{s[2]}</p>
             </div>"""
@@ -878,17 +965,17 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
 
     body = f"""
     <!-- HERO SECTION -->
-    <section class="relative overflow-hidden bg-gradient-to-br from-cyan-50 via-white to-emerald-50/60 py-14 sm:py-20">
+    <section class="relative overflow-hidden bg-gradient-to-br from-brand-50 via-white to-emerald-50/60 py-14 sm:py-20">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="grid items-center gap-12 lg:grid-cols-12">
                 <div class="lg:col-span-7">
-                    <div class="inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-white px-4 py-1.5 text-xs font-bold text-cyan-900 shadow-sm">
+                    <div class="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-4 py-1.5 text-xs font-bold text-brand-900 shadow-sm">
                         <span class="h-2 w-2 rounded-full bg-emerald-600" aria-hidden="true"></span>
-                        <span>Bangladesh’s Trusted Partner for Medical Treatment in India</span>
+                        <span>{e(hero_badge)}</span>
                     </div>
 
                     <h1 class="mt-6 font-heading text-3xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
-                        Your Right Decision Ensures <span class="text-cyan-800">Your Best Medical Treatment</span>
+                        {e(hero_title)} <span class="text-brand-800">{e(hero_highlight)}</span>
                     </h1>
 
                     <p class="mt-5 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
@@ -896,22 +983,22 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
                     </p>
 
                     <div class="mt-8 flex flex-wrap items-center gap-4">
-                        <a href="/service-request" class="cursor-pointer inline-flex items-center gap-2.5 rounded-xl bg-emerald-700 px-6 py-3.5 text-base font-bold text-white shadow-md transition hover:bg-emerald-800">
+                        <a href="/service-request" class="cursor-pointer inline-flex items-center gap-2.5 rounded-xl btn-brand px-6 py-3.5 text-base font-bold text-white shadow-md transition ">
                             <span>Get Free Treatment Plan & Appointment</span>
                             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                         </a>
-                        <a href="/telemedicine" class="cursor-pointer inline-flex items-center gap-2.5 rounded-xl border-2 border-cyan-800 bg-white px-6 py-3.5 text-base font-bold text-cyan-900 transition hover:bg-cyan-50">
-                            <svg class="h-5 w-5 text-cyan-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m22 8-6 4 6 4V8Z"/></svg>
+                        <a href="/telemedicine" class="cursor-pointer inline-flex items-center gap-2.5 rounded-xl border-2 border-brand-800 bg-white px-6 py-3.5 text-base font-bold text-brand-900 transition hover:bg-brand-50">
+                            <svg class="h-5 w-5 text-brand-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m22 8-6 4 6 4V8Z"/></svg>
                             <span>Book Video Consultation</span>
                         </a>
                     </div>
 
                     <!-- Live Tracking Widget -->
-                    <form action="/track" method="GET" class="mt-8 max-w-xl rounded-2xl border border-cyan-200 bg-white p-2 shadow-sm">
+                    <form action="/track" method="GET" class="mt-8 max-w-xl rounded-2xl border border-brand-200 bg-white p-2 shadow-sm">
                         <label for="hero-track" class="sr-only">Track Request Status by Tracking Code</label>
                         <div class="flex flex-col gap-2 sm:flex-row">
-                            <input id="hero-track" name="tracking_code" type="text" value="MS-2026-DEMO1" placeholder="Enter Tracking Code (e.g. MS-2026-DEMO1)" class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-900 focus:border-cyan-700 focus:outline-none">
-                            <button type="submit" class="cursor-pointer shrink-0 rounded-xl bg-cyan-800 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-cyan-900">
+                            <input id="hero-track" name="tracking_code" type="text" value="MS-2026-DEMO1" placeholder="Enter Tracking Code (e.g. MS-2026-DEMO1)" class="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-900 focus:border-brand-700 focus:outline-none">
+                            <button type="submit" class="cursor-pointer shrink-0 rounded-xl bg-brand-800 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-900">
                                 Track Live Status
                             </button>
                         </div>
@@ -922,7 +1009,7 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
                     <div class="med-card p-6 sm:p-8">
                         <div class="flex items-center justify-between border-b border-slate-100 pb-5">
                             <div>
-                                <p class="text-xs font-bold uppercase tracking-wider text-cyan-800">Trusted Medical Assistance</p>
+                                <p class="text-xs font-bold uppercase tracking-wider text-brand-800">Trusted Medical Assistance</p>
                                 <h2 class="mt-1 font-heading text-xl font-bold text-slate-900">Why Choose Med Solutions?</h2>
                             </div>
                             <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-700">
@@ -931,9 +1018,9 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
                         </div>
 
                         <dl class="mt-6 grid grid-cols-2 gap-4">
-                            <div class="rounded-xl bg-cyan-50/70 p-4">
+                            <div class="rounded-xl bg-brand-50/70 p-4">
                                 <dt class="text-xs font-medium text-slate-600">Partner Hospitals</dt>
-                                <dd class="mt-1 font-heading text-2xl font-extrabold text-cyan-900">50+ Accredited</dd>
+                                <dd class="mt-1 font-heading text-2xl font-extrabold text-brand-900">50+ Accredited</dd>
                             </div>
                             <div class="rounded-xl bg-emerald-50/70 p-4">
                                 <dt class="text-xs font-medium text-slate-600">Patients Assisted</dt>
@@ -949,7 +1036,7 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
                             </div>
                         </dl>
 
-                        <div class="mt-6 rounded-xl border border-cyan-100 bg-cyan-50/40 p-4">
+                        <div class="mt-6 rounded-xl border border-brand-100 bg-brand-50/40 p-4">
                             <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Leading Indian Hospital Network</p>
                             <p class="mt-1.5 text-sm font-semibold text-slate-800">
                                 Apollo • CMC Vellore • Manipal • Narayana Health • Fortis • Medanta • AIG • Tata Memorial
@@ -966,7 +1053,7 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="grid items-center gap-10 lg:grid-cols-2">
                 <div>
-                    <span class="text-xs font-bold uppercase tracking-widest text-cyan-800">About Med Solutions</span>
+                    <span class="text-xs font-bold uppercase tracking-widest text-brand-800">About Med Solutions</span>
                     <h2 class="mt-2 font-heading text-2xl font-extrabold text-slate-900 sm:text-3xl">
                         Making Cross-Border Healthcare Safe, Transparent & Stress-Free for Bangladeshi Patients
                     </h2>
@@ -990,19 +1077,19 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
                 </div>
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div class="med-card p-5">
-                        <h3 class="font-heading font-bold text-cyan-900">Right Specialist Match</h3>
+                        <h3 class="font-heading font-bold text-brand-900">Right Specialist Match</h3>
                         <p class="mt-2 text-sm text-slate-600">Clinical assessment of your diagnostic reports to connect you with the top senior consultant for your condition.</p>
                     </div>
                     <div class="med-card p-5">
-                        <h3 class="font-heading font-bold text-cyan-900">Fast Visa Invitation (VIL)</h3>
+                        <h3 class="font-heading font-bold text-brand-900">Fast Visa Invitation (VIL)</h3>
                         <p class="mt-2 text-sm text-slate-600">High Commission–compliant Visa Invitation Letters obtained directly from accredited Indian hospitals.</p>
                     </div>
                     <div class="med-card p-5">
-                        <h3 class="font-heading font-bold text-cyan-900">Upfront Cost Clarity</h3>
+                        <h3 class="font-heading font-bold text-brand-900">Upfront Cost Clarity</h3>
                         <p class="mt-2 text-sm text-slate-600">Written pre-travel estimates detailing treatment procedures, expected stay duration, and hospital expenses.</p>
                     </div>
                     <div class="med-card p-5">
-                        <h3 class="font-heading font-bold text-cyan-900">Post-Return Continuity</h3>
+                        <h3 class="font-heading font-bold text-brand-900">Post-Return Continuity</h3>
                         <p class="mt-2 text-sm text-slate-600">Dedicated video conferencing with your treating Indian doctor for lab reviews after returning to Bangladesh.</p>
                     </div>
                 </div>
@@ -1014,7 +1101,7 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
     <section id="services" class="bg-slate-50 py-16">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-3xl text-center">
-                <span class="text-xs font-bold uppercase tracking-widest text-cyan-800">Our 6 Core Services</span>
+                <span class="text-xs font-bold uppercase tracking-widest text-brand-800">Our 6 Core Services</span>
                 <h2 class="mt-2 font-heading text-2xl font-extrabold text-slate-900 sm:text-4xl">Complete Medical Tourism Assistance Under One Roof</h2>
                 <p class="mt-3 text-base text-slate-600">Select any individual or combined assistance service and upload your medical reports online.</p>
             </div>
@@ -1028,7 +1115,7 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
     <section id="pre-travel-guide" class="bg-white py-16">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-3xl text-center">
-                <span class="inline-block rounded-full bg-cyan-50 px-3.5 py-1 text-xs font-bold text-cyan-900 ring-1 ring-cyan-200">Patient & Attendant Preparation Guide</span>
+                <span class="inline-block rounded-full bg-brand-50 px-3.5 py-1 text-xs font-bold text-brand-900 ring-1 ring-brand-200">Patient & Attendant Preparation Guide</span>
                 <h2 class="mt-3 font-heading text-2xl font-extrabold text-slate-900 sm:text-4xl">
                     Essential Information Before Travelling to India for Medical Treatment
                 </h2>
@@ -1037,7 +1124,7 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
             <div class="mt-12 grid gap-6 lg:grid-cols-5">
                 {steps_html}
             </div>
-            <div class="mt-10 rounded-2xl border border-cyan-200 bg-cyan-50/60 p-6 sm:p-8">
+            <div class="mt-10 rounded-2xl border border-brand-200 bg-brand-50/60 p-6 sm:p-8">
                 <div class="grid items-center gap-6 lg:grid-cols-3">
                     <div class="lg:col-span-2">
                         <h3 class="font-heading text-lg font-bold text-slate-900">Mandatory Pre-Travel Document Checklist:</h3>
@@ -1049,7 +1136,7 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
                         </div>
                     </div>
                     <div class="lg:text-right">
-                        <a href="/service-request?service=visa_processing" class="cursor-pointer inline-flex items-center justify-center rounded-xl bg-cyan-800 px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-cyan-900">
+                        <a href="/service-request?service=visa_processing" class="cursor-pointer inline-flex items-center justify-center rounded-xl bg-brand-800 px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-brand-900">
                             Request Visa & VIL Support
                         </a>
                     </div>
@@ -1062,7 +1149,7 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
     <section class="bg-slate-50 py-16">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="mb-8">
-                <span class="text-xs font-bold uppercase tracking-widest text-cyan-800">Verified Patient Stories</span>
+                <span class="text-xs font-bold uppercase tracking-widest text-brand-800">Verified Patient Stories</span>
                 <h2 class="mt-2 font-heading text-2xl font-extrabold text-slate-900 sm:text-3xl">Trusted by Patients & Families Across Bangladesh</h2>
             </div>
             <div class="grid gap-6 md:grid-cols-3">
@@ -1076,17 +1163,17 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="grid gap-12 lg:grid-cols-12">
                 <div class="lg:col-span-5">
-                    <span class="text-xs font-bold uppercase tracking-widest text-cyan-800">Speak With a Care Coordinator</span>
+                    <span class="text-xs font-bold uppercase tracking-widest text-brand-800">Speak With a Care Coordinator</span>
                     <h2 class="mt-2 font-heading text-2xl font-extrabold text-slate-900 sm:text-3xl">Have Questions About Treatment in India? Contact Us</h2>
                     <p class="mt-3 text-sm leading-relaxed text-slate-600">Send us an inquiry regarding specialist appointments, medical visa documentation, or hospital cost estimates.</p>
                     <div class="mt-6 space-y-3 text-sm">
                         <div class="rounded-xl bg-slate-50 p-4">
                             <div class="font-bold text-slate-900">24/7 Helpline & WhatsApp</div>
-                            <div class="mt-1 font-semibold text-cyan-800">+880 XXXX-XXXXXX</div>
+                            <div class="mt-1 font-semibold text-brand-800">{e(helpline)}</div>
                         </div>
                         <div class="rounded-xl bg-slate-50 p-4">
                             <div class="font-bold text-slate-900">Email & Official Website</div>
-                            <div class="mt-1 text-slate-600">support@example.com</div>
+                            <div class="mt-1 text-slate-600">{e(support_email)}</div>
                         </div>
                     </div>
                 </div>
@@ -1095,26 +1182,26 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
                         <div class="grid gap-5 sm:grid-cols-2">
                             <div>
                                 <label for="c-name" class="block text-sm font-semibold text-slate-800">Full Name <span class="text-red-600">*</span></label>
-                                <input id="c-name" name="name" type="text" required class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none">
+                                <input id="c-name" name="name" type="text" required class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none">
                             </div>
                             <div>
                                 <label for="c-phone" class="block text-sm font-semibold text-slate-800">Phone / WhatsApp Number <span class="text-red-600">*</span></label>
-                                <input id="c-phone" name="phone" type="tel" placeholder="017XXXXXXXX" required class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none">
+                                <input id="c-phone" name="phone" type="tel" placeholder="017XXXXXXXX" required class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none">
                             </div>
                             <div>
                                 <label for="c-email" class="block text-sm font-semibold text-slate-800">Email Address</label>
-                                <input id="c-email" name="email" type="email" class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none">
+                                <input id="c-email" name="email" type="email" class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none">
                             </div>
                             <div>
                                 <label for="c-subject" class="block text-sm font-semibold text-slate-800">Subject</label>
-                                <input id="c-subject" name="subject" type="text" placeholder="Appointment / Medical Visa Inquiry" class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none">
+                                <input id="c-subject" name="subject" type="text" placeholder="Appointment / Medical Visa Inquiry" class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none">
                             </div>
                             <div class="sm:col-span-2">
                                 <label for="c-msg" class="block text-sm font-semibold text-slate-800">Your Message <span class="text-red-600">*</span></label>
-                                <textarea id="c-msg" name="message" rows="3" required class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none"></textarea>
+                                <textarea id="c-msg" name="message" rows="3" required class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none"></textarea>
                             </div>
                         </div>
-                        <button type="submit" class="mt-5 cursor-pointer rounded-xl bg-cyan-800 px-6 py-3 text-sm font-bold text-white hover:bg-cyan-900">Send Message</button>
+                        <button type="submit" class="mt-5 cursor-pointer rounded-xl bg-brand-800 px-6 py-3 text-sm font-bold text-white hover:bg-brand-900">Send Message</button>
                     </form>
                 </div>
             </div>
@@ -1136,8 +1223,8 @@ def render_service_form(preselected: str = "appointment", error_msg: str = "") -
         "AIG Hospitals (Hyderabad)",
     ]
     checkboxes = "".join(
-        f"""<label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-3.5 transition hover:border-cyan-500 hover:bg-cyan-50/40">
-                <input type="checkbox" name="selected_services" value="{k}" {'checked' if k == preselected else ''} class="mt-0.5 h-4 w-4 rounded border-slate-300 text-cyan-800">
+        f"""<label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-3.5 transition hover:border-accent-500 hover:bg-brand-50/40">
+                <input type="checkbox" name="selected_services" value="{k}" {'checked' if k == preselected else ''} class="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-800">
                 <span class="text-sm font-semibold text-slate-800">{e(v)}</span>
             </label>"""
         for k, v in SERVICE_NAMES.items()
@@ -1148,7 +1235,7 @@ def render_service_form(preselected: str = "appointment", error_msg: str = "") -
     <section class="py-12">
         <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
             <div class="mb-8 text-center">
-                <span class="inline-block rounded-full bg-cyan-50 px-3.5 py-1 text-xs font-bold text-cyan-900 ring-1 ring-cyan-200">Online Patient Assistance Booking</span>
+                <span class="inline-block rounded-full bg-brand-50 px-3.5 py-1 text-xs font-bold text-brand-900 ring-1 ring-brand-200">Online Patient Assistance Booking</span>
                 <h1 class="mt-3 font-heading text-2xl font-extrabold text-slate-900 sm:text-3xl">Medical Assistance & Appointment Request Form</h1>
                 <p class="mt-2 text-sm text-slate-600">Submit your patient details and medical reports below. An instant Tracking Code will be generated upon submission.</p>
             </div>
@@ -1159,15 +1246,15 @@ def render_service_form(preselected: str = "appointment", error_msg: str = "") -
                     <div class="mt-4 grid gap-5 sm:grid-cols-2">
                         <div>
                             <label for="sr-name" class="block text-sm font-semibold text-slate-800">Patient Full Name (As on Passport) <span class="text-red-600">*</span></label>
-                            <input id="sr-name" name="patient_name" type="text" required placeholder="e.g. Md. Kamrul Islam" class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none">
+                            <input id="sr-name" name="patient_name" type="text" required placeholder="e.g. Md. Kamrul Islam" class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none">
                         </div>
                         <div>
                             <label for="sr-phone" class="block text-sm font-semibold text-slate-800">Mobile / WhatsApp Number <span class="text-red-600">*</span></label>
-                            <input id="sr-phone" name="phone" type="tel" required placeholder="017XXXXXXXX" class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none">
+                            <input id="sr-phone" name="phone" type="tel" required placeholder="017XXXXXXXX" class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none">
                         </div>
                         <div class="sm:col-span-2">
                             <label for="sr-email" class="block text-sm font-semibold text-slate-800">Email Address (For VIL & Appointment Confirmation)</label>
-                            <input id="sr-email" name="email" type="email" placeholder="patient@example.com" class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-cyan-700 focus:outline-none">
+                            <input id="sr-email" name="email" type="email" placeholder="patient@example.com" class="mt-1.5 w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm focus:border-brand-700 focus:outline-none">
                         </div>
                     </div>
                 </div>
@@ -1195,7 +1282,7 @@ def render_service_form(preselected: str = "appointment", error_msg: str = "") -
 
                     <div>
                         <label for="sr-file" class="block text-sm font-semibold text-slate-800">Upload Medical Reports & Prescriptions (PDF, JPG, PNG — Max 10 MB)</label>
-                        <input id="sr-file" name="medical_report" type="file" accept=".pdf,.jpg,.jpeg,.png" class="mt-2 w-full rounded-xl border border-dashed border-cyan-400 bg-cyan-50/40 p-3 text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-cyan-800 file:px-4 file:py-2 file:text-xs file:font-bold file:text-white">
+                        <input id="sr-file" name="medical_report" type="file" accept=".pdf,.jpg,.jpeg,.png" class="mt-2 w-full rounded-xl border border-dashed border-accent-400 bg-brand-50/40 p-3 text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-brand-800 file:px-4 file:py-2 file:text-xs file:font-bold file:text-white">
                     </div>
 
                     <div>
@@ -1205,7 +1292,7 @@ def render_service_form(preselected: str = "appointment", error_msg: str = "") -
                 </div>
 
                 <div class="mt-8 flex justify-end">
-                    <button type="submit" class="cursor-pointer rounded-xl bg-emerald-700 px-7 py-3.5 text-sm font-bold text-white shadow-md hover:bg-emerald-800">
+                    <button type="submit" class="cursor-pointer rounded-xl btn-brand px-7 py-3.5 text-sm font-bold text-white shadow-md ">
                         Submit Service Request
                     </button>
                 </div>
@@ -1242,7 +1329,7 @@ def render_track(code: str = "", flash_msg: str = "", req=None, denied: bool = F
             <div class="flex flex-wrap items-center justify-between gap-4">
                 <div>
                     <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Tracking Code</span>
-                    <h2 class="font-heading text-xl font-extrabold text-cyan-900">{e(req["tracking_code"])}</h2>
+                    <h2 class="font-heading text-xl font-extrabold text-brand-900">{e(req["tracking_code"])}</h2>
                     <p class="text-sm text-slate-600">Patient: <strong>{e(req["patient_name"])}</strong> ({e(req["phone"])})</p>
                 </div>
                 {render_badge(req["status"])}
@@ -1263,7 +1350,7 @@ def render_track(code: str = "", flash_msg: str = "", req=None, denied: bool = F
                 </div>
                 <div>
                     <dt class="text-xs font-semibold text-slate-500">Attached Medical Report</dt>
-                    <dd class="mt-1 font-medium text-cyan-900">{e(req["medical_report_name"] or "None attached")}</dd>
+                    <dd class="mt-1 font-medium text-brand-900">{e(req["medical_report_name"] or "None attached")}</dd>
                 </div>
                 <div class="sm:col-span-2">
                     <dt class="text-xs font-semibold text-slate-500">Care Coordinator Note</dt>
@@ -1279,9 +1366,9 @@ def render_track(code: str = "", flash_msg: str = "", req=None, denied: bool = F
                 <h1 class="font-heading text-2xl font-extrabold text-slate-900">Track Live Request Status</h1>
                 <p class="mt-1 text-sm text-slate-600">Enter your Tracking Code and the registered phone number used for the request.</p>
                 <form action="/track" method="GET" class="mt-5 flex flex-col gap-3 sm:flex-row">
-                    <input type="tel" name="phone" value="{e(phone)}" placeholder="Registered phone number" class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-700/20">
-                    <input type="text" name="tracking_code" value="{e(code_clean)}" placeholder="MS-2026-DEMO1" required class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold uppercase focus:border-cyan-700 focus:outline-none">
-                    <button type="submit" class="cursor-pointer shrink-0 rounded-xl bg-cyan-800 px-6 py-3 text-sm font-bold text-white hover:bg-cyan-900">Track Status</button>
+                    <input type="tel" name="phone" value="{e(phone)}" placeholder="Registered phone number" class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-700/20">
+                    <input type="text" name="tracking_code" value="{e(code_clean)}" placeholder="MS-2026-DEMO1" required class="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm font-bold uppercase focus:border-brand-700 focus:outline-none">
+                    <button type="submit" class="cursor-pointer shrink-0 rounded-xl bg-brand-800 px-6 py-3 text-sm font-bold text-white hover:bg-brand-900">Track Status</button>
                 </form>
                 {result_html}
             </div>
@@ -1307,7 +1394,7 @@ def render_telemedicine(flash_msg: str = "", error_msg: str = "") -> bytes:
     <section class="py-12">
         <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
             <div class="mb-8 text-center">
-                <span class="inline-block rounded-full bg-cyan-50 px-3.5 py-1 text-xs font-bold text-cyan-900 ring-1 ring-cyan-200">Pre-Travel & Post-Return Video Consultation</span>
+                <span class="inline-block rounded-full bg-brand-50 px-3.5 py-1 text-xs font-bold text-brand-900 ring-1 ring-brand-200">Pre-Travel & Post-Return Video Consultation</span>
                 <h1 class="mt-3 font-heading text-2xl font-extrabold text-slate-900 sm:text-3xl">Book a Telemedicine Session with Specialists in India</h1>
                 <p class="mt-2 text-sm text-slate-600">Schedule a video conference with Indian doctors before travelling to discuss treatment options, or book a post-return follow-up session from Bangladesh.</p>
             </div>
@@ -1316,14 +1403,14 @@ def render_telemedicine(flash_msg: str = "", error_msg: str = "") -> bytes:
                 <fieldset class="mb-6">
                     <legend class="text-sm font-bold text-slate-900">Select Consultation Stage <span class="text-red-600">*</span></legend>
                     <div class="mt-3 grid gap-4 sm:grid-cols-2">
-                        <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 hover:bg-cyan-50/40">
+                        <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 hover:bg-brand-50/40">
                             <input type="radio" name="consultation_stage" value="pre_travel" checked class="mt-1">
                             <div>
                                 <span class="block text-sm font-bold text-slate-900">Pre-Travel Evaluation</span>
                                 <span class="block text-xs text-slate-600">Discuss reports, treatment plan & estimated budget before travelling to India</span>
                             </div>
                         </label>
-                        <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 hover:bg-cyan-50/40">
+                        <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 hover:bg-brand-50/40">
                             <input type="radio" name="consultation_stage" value="post_return" class="mt-1">
                             <div>
                                 <span class="block text-sm font-bold text-slate-900">Post-Return Follow-Up</span>
@@ -1365,7 +1452,7 @@ def render_telemedicine(flash_msg: str = "", error_msg: str = "") -> bytes:
                 </div>
 
                 <div class="mt-7 flex justify-end">
-                    <button type="submit" class="cursor-pointer rounded-xl bg-emerald-700 px-7 py-3.5 text-sm font-bold text-white shadow-md hover:bg-emerald-800">
+                    <button type="submit" class="cursor-pointer rounded-xl btn-brand px-7 py-3.5 text-sm font-bold text-white shadow-md ">
                         Schedule Video Consultation
                     </button>
                 </div>
@@ -1383,12 +1470,13 @@ def render_patient_portal(flash_msg: str = "") -> bytes:
     conn.close()
     reqs = [r for r in all_reqs if owns_record(r, user)]
     consults = [c for c in all_consults if owns_record(c, user)]
+    visa_open = sum(1 for r in reqs if r['visa_status'] not in ('not_requested', 'approved'))
 
     rows_html = ""
     for r in reqs:
         rows_html += f"""
         <tr>
-            <td class="px-6 py-4 font-mono font-bold text-cyan-900">
+            <td class="px-6 py-4 font-mono font-bold text-brand-900">
                 <a href="/track?tracking_code={e(r['tracking_code'])}" class="underline hover:text-emerald-700">{e(r['tracking_code'])}</a>
             </td>
             <td class="px-6 py-4">
@@ -1404,14 +1492,14 @@ def render_patient_portal(flash_msg: str = "") -> bytes:
     for c in consults:
         stage = "Post-Return Follow-Up" if c["consultation_stage"] == "post_return" else "Pre-Travel Specialist Consultation"
         join_btn = (
-            f'<a href="{e(c["meeting_link"])}" target="_blank" rel="noopener" class="cursor-pointer rounded-xl bg-cyan-800 px-4 py-2 text-xs font-bold text-white hover:bg-cyan-900">Join Video Call</a>'
+            f'<a href="{e(c["meeting_link"])}" target="_blank" rel="noopener" class="cursor-pointer rounded-xl bg-brand-800 px-4 py-2 text-xs font-bold text-white hover:bg-brand-900">Join Video Call</a>'
             if c["meeting_link"]
             else '<span class="text-xs text-slate-400">Link Pending</span>'
         )
         consult_html += f"""
         <div class="flex flex-wrap items-center justify-between gap-4 px-6 py-4">
             <div>
-                <span class="text-xs font-bold text-cyan-800">{stage}</span>
+                <span class="text-xs font-bold text-brand-800">{stage}</span>
                 <h3 class="font-bold text-slate-900">{e(c['patient_name'])} — {e(c['department'])}</h3>
                 <p class="text-xs text-slate-500">Scheduled: {e(c['preferred_date'])} {('• ' + e(c['preferred_doctor'])) if c['preferred_doctor'] else ''}</p>
             </div>
@@ -1424,15 +1512,23 @@ def render_patient_portal(flash_msg: str = "") -> bytes:
     body = f"""
     <section class="py-10">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                    <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-900">Patient Portal (Authenticated View)</span>
-                    <h1 class="mt-2 font-heading text-2xl font-extrabold text-slate-900">Patient Status & Telemedicine Dashboard</h1>
+            <div class="overflow-hidden rounded-3xl bg-gradient-to-br from-brand-950 via-brand-800 to-accent-600 p-6 text-white shadow-xl sm:p-8">
+                <div class="flex flex-wrap items-center justify-between gap-5">
+                    <div>
+                        <span class="inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-bold tracking-wide">Patient Portal</span>
+                        <h1 class="mt-3 font-heading text-2xl font-extrabold sm:text-3xl">Welcome, {e(user['name'])}</h1>
+                        <p class="mt-2 max-w-xl text-sm text-brand-100">Track every request, visa step and video consultation in one place.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="/service-request" class="cursor-pointer rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-brand-900 shadow-sm hover:bg-brand-50">+ New Service Request</a>
+                        <a href="/telemedicine" class="cursor-pointer rounded-xl border border-white/30 px-4 py-2.5 text-sm font-bold text-white hover:bg-white/10">Book Telemedicine</a>
+                    </div>
                 </div>
-                <div class="flex gap-3">
-                    <a href="/service-request" class="cursor-pointer rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800">+ New Service Request</a>
-                    <a href="/telemedicine" class="cursor-pointer rounded-xl border border-cyan-700 bg-white px-4 py-2.5 text-sm font-bold text-cyan-900 hover:bg-cyan-50">Book Telemedicine</a>
-                </div>
+            </div>
+            <div class="mt-6 grid gap-4 sm:grid-cols-3">
+                <div class="med-card p-5"><div class="text-xs font-bold uppercase tracking-wide text-slate-500">My service requests</div><div class="mt-2 font-heading text-3xl font-extrabold text-slate-900">{len(reqs)}</div></div>
+                <div class="med-card p-5"><div class="text-xs font-bold uppercase tracking-wide text-slate-500">Visa files in progress</div><div class="mt-2 font-heading text-3xl font-extrabold text-brand-800">{visa_open}</div></div>
+                <div class="med-card p-5"><div class="text-xs font-bold uppercase tracking-wide text-slate-500">Video consultations</div><div class="mt-2 font-heading text-3xl font-extrabold text-accent-700">{len(consults)}</div></div>
             </div>
 
             <div class="med-card mt-8 overflow-hidden">
@@ -1462,209 +1558,335 @@ def render_patient_portal(flash_msg: str = "") -> bytes:
     return layout("Patient Portal Dashboard | Med Solutions", body, "/patient", flash_msg=flash_msg)
 
 
+TESTIMONIAL_TEXT_FIELDS = ("patient_name", "district", "hospital_treated", "quote")
+
+
+def testimonial_fields(form_data) -> dict:
+    try:
+        rating = min(5, max(1, int(form_data.get("rating", "5"))))
+    except ValueError:
+        rating = 5
+    return {
+        "patient_name": form_data.get("patient_name", "").strip()[:120],
+        "district": form_data.get("district", "").strip()[:80],
+        "hospital_treated": form_data.get("hospital_treated", "").strip()[:160],
+        "quote": form_data.get("quote", "").strip()[:1000],
+        "rating": rating,
+    }
+
+
+def admin_section(anchor: str, title: str, subtitle: str, inner: str) -> str:
+    return (
+        '<section id="' + anchor + '" class="scroll-mt-28">'
+        '<div class="mb-4"><h2 class="font-heading text-xl font-extrabold text-slate-900">' + title + "</h2>"
+        '<p class="mt-1 text-sm text-slate-500">' + subtitle + "</p></div>"
+        + inner + "</section>"
+    )
+
+
 def render_admin_dashboard(flash_msg: str = "", panel: str = "admin") -> bytes:
     is_staff = panel == "staff"
+    is_admin = not is_staff
     current_name = _ctx.user["name"] if getattr(_ctx, "user", None) is not None else ""
     role_label = ("STAFF" if is_staff else "ADMIN") + " (" + e(current_name) + ")"
-    panel_title = "Med Solutions Care Coordinator Panel" if is_staff else "Med Solutions Admin & Coordinator Control Panel"
+    panel_title = "Care Coordinator Panel" if is_staff else "Admin Control Panel"
+    panel_intro = (
+        "Handle patient requests, visa files, appointments and telemedicine links."
+        if is_staff
+        else "Control the whole website: brand, homepage text, contact details, services, testimonials, users and every patient request."
+    )
+    cfg = get_settings()
     conn = get_db()
     reqs = conn.execute("SELECT * FROM service_requests ORDER BY id DESC").fetchall()
     consults = conn.execute("SELECT * FROM consultations ORDER BY id DESC").fetchall()
     services = conn.execute("SELECT * FROM services ORDER BY sort_order").fetchall()
     users = conn.execute("SELECT * FROM users ORDER BY id").fetchall()
     contacts = conn.execute("SELECT * FROM contacts ORDER BY id DESC").fetchall()
+    testimonials = conn.execute("SELECT * FROM testimonials ORDER BY id DESC").fetchall()
+    conn.close()
 
     total_req = len(reqs)
     pending_req = sum(1 for r in reqs if r["status"] == "pending")
     active_visas = sum(1 for r in reqs if r["visa_status"] in ("documents_received", "vil_issued", "ivac_submitted"))
     upcoming_tm = sum(1 for c in consults if c["status"] in ("pending", "scheduled"))
-    conn.close()
+    active_services = sum(1 for s in services if s["is_active"])
 
     def sel_opts(options, current):
-        return "".join(f'<option value="{o}" {"selected" if o == current else ""}>{o.replace("_", " ").title()}</option>' for o in options)
+        out = ""
+        for o in options:
+            sel = " selected" if o == current else ""
+            out += '<option value="' + str(o) + '"' + sel + ">" + str(o).replace("_", " ").title() + "</option>"
+        return out
 
+    input_cls = "mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-200"
+    select_cls = "mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold"
+    label_cls = "block text-xs font-bold uppercase tracking-wide text-slate-600"
+
+    # 1. Patient requests
     req_cards = ""
     for r in reqs:
-        req_cards += f"""
-        <form action="/admin/update-request" method="POST" class="med-card p-5">
-            <input type="hidden" name="id" value="{r['id']}">
-            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
-                <div>
-                    <span class="font-mono text-sm font-extrabold text-cyan-900">{e(r['tracking_code'])}</span>
-                    <span class="mx-2 text-slate-300">|</span>
-                    <strong class="text-slate-900">{e(r['patient_name'])}</strong>
-                    <span class="text-xs text-slate-500">({e(r['phone'])}) • {e(r['preferred_hospital'] or 'Hospital TBD')}</span>
-                </div>
-                {render_badge(r['status'])}
-            </div>
-            <div class="mt-4 grid gap-3 sm:grid-cols-3">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700">Overall Status</label>
-                    <select name="status" class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold">
-                        {sel_opts(["pending", "processing", "confirmed", "completed", "cancelled"], r["status"])}
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700">Visa Processing Status</label>
-                    <select name="visa_status" class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold">
-                        {sel_opts(["not_requested", "documents_received", "vil_issued", "ivac_submitted", "approved"], r["visa_status"])}
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-700">Doctor Appointment</label>
-                    <select name="appointment_status" class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold">
-                        {sel_opts(["not_requested", "requested", "slot_confirmed", "completed"], r["appointment_status"])}
-                    </select>
-                </div>
-            </div>
-            <div class="mt-3 flex flex-col gap-3 sm:flex-row">
-                <input type="text" name="admin_notes" value="{e(r['admin_notes'] or '')}" placeholder="Coordinator note for patient (e.g. VIL emailed, airport pickup scheduled)..." class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs">
-                <button type="submit" class="cursor-pointer shrink-0 rounded-lg bg-emerald-700 px-5 py-2 text-xs font-bold text-white hover:bg-emerald-800">Update Status</button>
-            </div>
-        </form>"""
+        req_cards += (
+            '<form action="/admin/update-request" method="POST" class="med-card p-5">'
+            '<input type="hidden" name="id" value="' + str(r["id"]) + '">'
+            '<div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">'
+            "<div>"
+            '<span class="font-mono text-sm font-extrabold text-brand-900">' + e(r["tracking_code"]) + "</span>"
+            '<span class="mx-2 text-slate-300">|</span>'
+            '<strong class="text-slate-900">' + e(r["patient_name"]) + "</strong>"
+            '<span class="text-xs text-slate-500"> (' + e(r["phone"]) + ") • " + e(r["preferred_hospital"] or "Hospital TBD") + "</span>"
+            "</div>" + render_badge(r["status"]) + "</div>"
+            '<div class="mt-4 grid gap-3 sm:grid-cols-3">'
+            '<div><label class="' + label_cls + '">Overall Status</label><select name="status" class="' + select_cls + '">'
+            + sel_opts(["pending", "processing", "confirmed", "completed", "cancelled"], r["status"]) + "</select></div>"
+            '<div><label class="' + label_cls + '">Visa Processing Status</label><select name="visa_status" class="' + select_cls + '">'
+            + sel_opts(["not_requested", "documents_received", "vil_issued", "ivac_submitted", "approved"], r["visa_status"]) + "</select></div>"
+            '<div><label class="' + label_cls + '">Doctor Appointment</label><select name="appointment_status" class="' + select_cls + '">'
+            + sel_opts(["not_requested", "requested", "slot_confirmed", "completed"], r["appointment_status"]) + "</select></div>"
+            "</div>"
+            '<div class="mt-3 flex flex-col gap-3 sm:flex-row">'
+            '<input type="text" name="admin_notes" value="' + e(r["admin_notes"] or "") + '" placeholder="Coordinator note for patient (e.g. VIL emailed, airport pickup scheduled)..." class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs">'
+            '<button type="submit" class="btn-brand shrink-0 cursor-pointer rounded-lg px-5 py-2 text-xs font-bold text-white">Update Status</button>'
+            "</div></form>"
+        )
+    if not req_cards:
+        req_cards = '<p class="med-card p-6 text-sm text-slate-500">No patient requests yet.</p>'
 
+    # 2. Telemedicine
     tm_cards = ""
     for c in consults:
-        tm_cards += f"""
-        <form action="/admin/update-consultation" method="POST" class="med-card p-5">
-            <input type="hidden" name="id" value="{c['id']}">
-            <div class="grid items-end gap-4 sm:grid-cols-12">
-                <div class="sm:col-span-4">
-                    <span class="text-xs font-bold text-cyan-800">{'Post-Return Follow-Up' if c['consultation_stage'] == 'post_return' else 'Pre-Travel Consultation'}</span>
-                    <h3 class="font-bold text-slate-900">{e(c['patient_name'])} ({e(c['phone'])})</h3>
-                    <p class="text-xs text-slate-500">{e(c['department'])} • {e(c['preferred_date'])}</p>
-                </div>
-                <div class="sm:col-span-3">
-                    <label class="block text-xs font-bold text-slate-700">Status</label>
-                    <select name="status" class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold">
-                        {sel_opts(["pending", "scheduled", "completed", "cancelled"], c["status"])}
-                    </select>
-                </div>
-                <div class="sm:col-span-3">
-                    <label class="block text-xs font-bold text-slate-700">Video Meeting Link (Meet/Zoom)</label>
-                    <input type="url" name="meeting_link" value="{e(c['meeting_link'] or '')}" placeholder="https://meet.google.com/..." class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs">
-                </div>
-                <div class="sm:col-span-2">
-                    <button type="submit" class="w-full cursor-pointer rounded-lg bg-cyan-800 px-4 py-2 text-xs font-bold text-white hover:bg-cyan-900">Save Link</button>
-                </div>
-            </div>
-        </form>"""
+        stage = "Post-Return Follow-Up" if c["consultation_stage"] == "post_return" else "Pre-Travel Consultation"
+        tm_cards += (
+            '<form action="/admin/update-consultation" method="POST" class="med-card p-5">'
+            '<input type="hidden" name="id" value="' + str(c["id"]) + '">'
+            '<div class="grid items-end gap-4 sm:grid-cols-12">'
+            '<div class="sm:col-span-4">'
+            '<span class="text-xs font-bold text-brand-800">' + stage + "</span>"
+            '<h3 class="font-bold text-slate-900">' + e(c["patient_name"]) + " (" + e(c["phone"]) + ")</h3>"
+            '<p class="text-xs text-slate-500">' + e(c["department"]) + " • " + e(c["preferred_date"]) + "</p></div>"
+            '<div class="sm:col-span-3"><label class="' + label_cls + '">Status</label><select name="status" class="' + select_cls + '">'
+            + sel_opts(["pending", "scheduled", "completed", "cancelled"], c["status"]) + "</select></div>"
+            '<div class="sm:col-span-3"><label class="' + label_cls + '">Video Meeting Link (Meet/Zoom)</label>'
+            '<input type="url" name="meeting_link" value="' + e(c["meeting_link"] or "") + '" placeholder="https://meet.google.com/..." class="' + input_cls.replace("text-sm", "text-xs") + '"></div>'
+            '<div class="sm:col-span-2"><button type="submit" class="btn-brand w-full cursor-pointer rounded-lg px-4 py-2 text-xs font-bold text-white">Save Link</button></div>'
+            "</div></form>"
+        )
+    if not tm_cards:
+        tm_cards = '<p class="med-card p-6 text-sm text-slate-500">No telemedicine bookings yet.</p>'
 
+    # 3. Website settings (admin only)
+    setting_groups = [
+        ("Brand", [
+            ("brand_name", "Brand name", "text"),
+            ("brand_tagline", "Tagline under the name", "text"),
+            ("announcement", "Top announcement banner (leave empty to hide)", "text"),
+        ]),
+        ("Homepage hero", [
+            ("hero_badge", "Small badge text", "text"),
+            ("hero_title", "Headline - first part", "text"),
+            ("hero_highlight", "Headline - highlighted part", "text"),
+        ]),
+        ("Contact & social links", [
+            ("helpline_phone", "24/7 helpline phone", "text"),
+            ("support_email", "Support email", "email"),
+            ("office_address", "Office address", "text"),
+            ("social_facebook", "Facebook URL", "url"),
+            ("social_youtube", "YouTube URL", "url"),
+            ("social_linkedin", "LinkedIn URL", "url"),
+        ]),
+        ("Footer", [
+            ("footer_about", "Footer description", "textarea"),
+        ]),
+    ]
+    settings_html = ""
+    for group_title, fields in setting_groups:
+        inner = ""
+        for key, label, kind in fields:
+            value = e(cfg.get(key, ""))
+            if kind == "textarea":
+                control = '<textarea name="' + key + '" rows="3" class="' + input_cls + '">' + value + "</textarea>"
+                span = "sm:col-span-2"
+            else:
+                control = '<input type="' + kind + '" name="' + key + '" value="' + value + '" class="' + input_cls + '">'
+                span = "sm:col-span-2" if key in ("announcement", "office_address") else ""
+            inner += '<div class="' + span + '"><label class="' + label_cls + '">' + e(label) + "</label>" + control + "</div>"
+        settings_html += (
+            '<div class="rounded-2xl border border-slate-200 bg-slate-50/60 p-5">'
+            '<h3 class="font-heading text-sm font-extrabold uppercase tracking-wider text-brand-900">' + group_title + "</h3>"
+            '<div class="mt-4 grid gap-4 sm:grid-cols-2">' + inner + "</div></div>"
+        )
+    settings_form = (
+        '<form action="/admin/update-settings" method="POST" class="med-card space-y-5 p-6">'
+        + settings_html
+        + '<div class="flex flex-wrap items-center justify-between gap-3">'
+        '<p class="text-xs text-slate-500">Changes appear on the live website immediately after saving.</p>'
+        '<button type="submit" class="btn-brand cursor-pointer rounded-xl px-6 py-2.5 text-sm font-bold text-white">Save Website Settings</button>'
+        "</div></form>"
+    )
+
+    # 4. Services (admin only)
     cms_cards = ""
     for s in services:
-        cms_cards += f"""
-        <form action="/admin/update-service" method="POST" class="med-card p-5 space-y-3">
-            <input type="hidden" name="id" value="{s['id']}">
-            <div class="flex items-center justify-between">
-                <span class="text-xs font-bold uppercase text-cyan-800">{e(s['slug'])}</span>
-                <label class="flex items-center gap-1.5 text-xs font-semibold">
-                    <input type="checkbox" name="is_active" value="1" {'checked' if s['is_active'] else ''}> Active on Homepage
-                </label>
-            </div>
-            <input type="text" name="title" value="{e(s['title'])}" required class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold">
-            <textarea name="description" rows="2" required class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs">{e(s['description'])}</textarea>
-            <button type="submit" class="cursor-pointer rounded-lg bg-slate-900 px-4 py-1.5 text-xs font-bold text-white hover:bg-slate-800">Save Service</button>
-        </form>"""
+        cms_cards += (
+            '<form action="/admin/update-service" method="POST" class="med-card space-y-3 p-5">'
+            '<input type="hidden" name="id" value="' + str(s["id"]) + '">'
+            '<div class="flex items-center justify-between">'
+            '<span class="text-xs font-bold uppercase text-brand-800">' + e(s["slug"]) + "</span>"
+            '<label class="flex items-center gap-1.5 text-xs font-semibold"><input type="checkbox" name="is_active" value="1" '
+            + ("checked" if s["is_active"] else "") + "> Active on Homepage</label></div>"
+            '<input type="text" name="title" value="' + e(s["title"]) + '" required class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold">'
+            '<textarea name="description" rows="2" required class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs">' + e(s["description"]) + "</textarea>"
+            '<button type="submit" class="cursor-pointer rounded-lg bg-slate-900 px-4 py-1.5 text-xs font-bold text-white hover:bg-slate-800">Save Service</button>'
+            "</form>"
+        )
+    services_section = admin_section(
+        "services", "Services",
+        "Edit the six core services shown on the homepage. Turn a service off to hide it from visitors.",
+        '<div class="grid gap-4 md:grid-cols-2">' + cms_cards + "</div>",
+    )
 
+    # 5. Testimonials (admin only)
+    def testimonial_form(action: str, t, button_html: str) -> str:
+        values = t or {"patient_name": "", "district": "", "hospital_treated": "", "quote": "", "rating": 5}
+        rating_opts = "".join(
+            '<option value="' + str(n) + '"' + (" selected" if int(values["rating"]) == n else "") + ">" + str(n) + " star" + ("s" if n != 1 else "") + "</option>"
+            for n in range(1, 6)
+        )
+        hidden = '<input type="hidden" name="id" value="' + str(t["id"]) + '">' if t else ""
+        return (
+            '<form action="' + action + '" method="POST" class="med-card space-y-3 p-5">' + hidden
+            + '<div class="grid gap-3 sm:grid-cols-2">'
+            '<div><label class="' + label_cls + '">Patient name</label><input type="text" name="patient_name" required value="' + e(values["patient_name"]) + '" class="' + input_cls.replace("text-sm", "text-xs") + '"></div>'
+            '<div><label class="' + label_cls + '">District</label><input type="text" name="district" required value="' + e(values["district"]) + '" class="' + input_cls.replace("text-sm", "text-xs") + '"></div>'
+            '<div><label class="' + label_cls + '">Hospital treated</label><input type="text" name="hospital_treated" required value="' + e(values["hospital_treated"]) + '" class="' + input_cls.replace("text-sm", "text-xs") + '"></div>'
+            '<div><label class="' + label_cls + '">Rating</label><select name="rating" class="' + select_cls + '">' + rating_opts + "</select></div>"
+            "</div>"
+            '<div><label class="' + label_cls + '">Quote</label><textarea name="quote" required rows="3" class="' + input_cls.replace("text-sm", "text-xs") + '">' + e(values["quote"]) + "</textarea></div>"
+            + button_html + "</form>"
+        )
+
+    testimonial_cards = ""
+    for t in testimonials:
+        delete_btn = (
+            '<div class="flex flex-wrap gap-2">'
+            '<button type="submit" class="btn-brand cursor-pointer rounded-lg px-4 py-2 text-xs font-bold text-white">Save Testimonial</button>'
+            '<button type="submit" formaction="/admin/delete-testimonial" onclick="return confirm(\'Delete this testimonial?\')" '
+            'class="cursor-pointer rounded-lg border border-red-300 bg-white px-4 py-2 text-xs font-bold text-red-700 hover:bg-red-50">Delete</button>'
+            "</div>"
+        )
+        testimonial_cards += testimonial_form("/admin/update-testimonial", t, delete_btn)
+    add_btn = '<button type="submit" class="btn-brand cursor-pointer rounded-lg px-5 py-2 text-xs font-bold text-white">Add Testimonial</button>'
+    testimonials_section = admin_section(
+        "testimonials", "Testimonials",
+        "Add, edit or remove patient stories shown in the homepage 'Trusted by Patients' section.",
+        '<div class="grid gap-4 lg:grid-cols-2">' + testimonial_form("/admin/add-testimonial", None, add_btn) + testimonial_cards + "</div>",
+    )
+
+    # 6. Users & roles (admin only)
     user_rows = ""
     for u in users:
-        user_rows += f"""
-        <tr>
-            <td class="px-5 py-3 font-semibold text-slate-900">{e(u['name'])}</td>
-            <td class="px-5 py-3 text-xs text-slate-600">{e(u['email'])} • {e(u['phone'])}</td>
-            <td class="px-5 py-3"><span class="rounded-full bg-cyan-50 px-2.5 py-1 text-xs font-bold text-cyan-900 uppercase">{e(u['role'])}</span></td>
-            <td class="px-5 py-3">
-                <form action="/admin/update-role" method="POST" class="flex items-center gap-2">
-                    <input type="hidden" name="id" value="{u['id']}">
-                    <select name="role" class="rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs">
-                        {sel_opts(["patient", "staff", "admin"], u["role"])}
-                    </select>
-                    <button type="submit" class="cursor-pointer rounded-lg bg-cyan-800 px-3 py-1 text-xs font-bold text-white">Save Role</button>
-                </form>
-            </td>
-        </tr>"""
+        user_rows += (
+            "<tr>"
+            '<td class="px-5 py-3 font-semibold text-slate-900">' + e(u["name"]) + "</td>"
+            '<td class="px-5 py-3 text-xs text-slate-600">' + e(u["email"]) + " • " + e(u["phone"]) + "</td>"
+            '<td class="px-5 py-3"><span class="rounded-full bg-brand-50 px-2.5 py-1 text-xs font-bold uppercase text-brand-900">' + e(u["role"]) + "</span></td>"
+            '<td class="px-5 py-3"><form action="/admin/update-role" method="POST" class="flex items-center gap-2">'
+            '<input type="hidden" name="id" value="' + str(u["id"]) + '">'
+            '<select name="role" class="rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-xs">' + sel_opts(["patient", "staff", "admin"], u["role"]) + "</select>"
+            '<button type="submit" class="btn-brand cursor-pointer rounded-lg px-3 py-1 text-xs font-bold text-white">Save Role</button>'
+            "</form></td></tr>"
+        )
+    users_section = admin_section(
+        "users", "Users & Roles",
+        "Choose who is an admin, staff member or patient. Each role signs in to its own panel.",
+        '<div class="med-card overflow-hidden"><div class="overflow-x-auto">'
+        '<table class="min-w-full divide-y divide-slate-200 text-left text-sm">'
+        '<thead class="bg-slate-50 text-xs font-bold uppercase text-slate-600"><tr>'
+        '<th class="px-5 py-3">Full name</th><th class="px-5 py-3">Contact</th><th class="px-5 py-3">Role</th><th class="px-5 py-3">Update role</th>'
+        "</tr></thead><tbody class=\"divide-y divide-slate-100\">" + user_rows + "</tbody></table></div></div>",
+    )
 
+    # 7. Inquiries (both panels)
     contact_rows = "".join(
-        f'<div class="border-b border-slate-100 py-3 last:border-0"><div class="text-sm font-bold text-slate-900">{e(c["name"])} ({e(c["phone"])})</div><div class="text-xs text-slate-600">{e(c["message"])}</div></div>'
+        '<div class="border-b border-slate-100 py-3 last:border-0"><div class="text-sm font-bold text-slate-900">'
+        + e(c["name"]) + " (" + e(c["phone"]) + ')</div><div class="text-xs text-slate-600">' + e(c["message"]) + "</div></div>"
         for c in contacts
     ) or '<p class="text-xs text-slate-500">No contact inquiries received yet.</p>'
+    inquiries_section = admin_section(
+        "inquiries", "Contact Inquiries",
+        "Messages sent through the homepage contact form.",
+        '<div class="med-card p-5">' + contact_rows + "</div>",
+    )
 
-    cms_section = "" if is_staff else f"""
-            <!-- Section 3: CMS Content -->
-            <div class="mt-10">
-                <h2 class="font-heading text-lg font-extrabold text-slate-900">3. Services & Content Management (CMS)</h2>
-                <div class="mt-4 grid gap-4 md:grid-cols-2">{cms_cards}</div>
-            </div>
+    kpi_cards = [
+        ("Total service requests", total_req, "text-slate-900"),
+        ("Pending requests", pending_req, "text-accent-700"),
+        ("Active visa files", active_visas, "text-brand-800"),
+        ("Telemedicine queue", upcoming_tm, "text-emerald-700"),
+    ]
+    if is_admin:
+        kpi_cards.append(("Active services on homepage", active_services, "text-brand-800"))
+    kpi_html = "".join(
+        '<div class="med-card p-5"><div class="text-xs font-bold uppercase tracking-wide text-slate-500">' + label
+        + '</div><div class="mt-2 font-heading text-3xl font-extrabold ' + color + '">' + str(value) + "</div></div>"
+        for label, value, color in kpi_cards
+    )
 
-"""
-    users_card = "" if is_staff else f"""
-                <div class="med-card overflow-hidden lg:col-span-8">
-                    <div class="border-b border-slate-100 px-5 py-4"><h2 class="font-heading font-bold text-slate-900">4. User & Role Management (Admin / Staff / Patient)</h2></div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
-                            <thead class="bg-slate-50 text-xs font-bold uppercase text-slate-600">
-                                <tr><th class="px-5 py-3">Full Name</th><th class="px-5 py-3">Contact</th><th class="px-5 py-3">Role</th><th class="px-5 py-3">Update Role</th></tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100">{user_rows}</tbody>
-                        </table>
-                    </div>
-                </div>
-"""
-    contacts_span = "lg:col-span-12" if is_staff else "lg:col-span-4"
-    body = f"""
-    <section class="py-10">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                    <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-950">RBAC Role: {role_label}</span>
-                    <h1 class="mt-2 font-heading text-2xl font-extrabold text-slate-900">{panel_title}</h1>
-                </div>
-            </div>
+    nav_items = [("overview", "Overview"), ("requests", "Patient Requests"), ("telemedicine", "Telemedicine")]
+    if is_admin:
+        nav_items += [("website", "Website Settings"), ("services", "Services"), ("testimonials", "Testimonials"), ("users", "Users & Roles")]
+    nav_items += [("inquiries", "Contact Inquiries")]
+    nav_links = "".join(
+        '<a href="#' + key + '" class="block rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-brand-50 hover:text-brand-900">' + label + "</a>"
+        for key, label in nav_items
+    )
 
-            <!-- KPI Cards -->
-            <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div class="med-card p-5">
-                    <div class="text-xs font-semibold text-slate-500">Total Service Requests</div>
-                    <div class="mt-1 font-heading text-3xl font-extrabold text-slate-900">{total_req}</div>
-                </div>
-                <div class="med-card p-5">
-                    <div class="text-xs font-semibold text-amber-800">Pending Requests</div>
-                    <div class="mt-1 font-heading text-3xl font-extrabold text-amber-700">{pending_req}</div>
-                </div>
-                <div class="med-card p-5">
-                    <div class="text-xs font-semibold text-cyan-800">Active Visa Files</div>
-                    <div class="mt-1 font-heading text-3xl font-extrabold text-cyan-800">{active_visas}</div>
-                </div>
-                <div class="med-card p-5">
-                    <div class="text-xs font-semibold text-emerald-800">Telemedicine Queue</div>
-                    <div class="mt-1 font-heading text-3xl font-extrabold text-emerald-700">{upcoming_tm}</div>
-                </div>
-            </div>
+    requests_section = admin_section("requests", "1. Patient Requests, Visa & Appointments", "Update each patient's overall status, visa processing and appointment progress.", '<div class="space-y-4">' + req_cards + "</div>")
+    telemedicine_section = admin_section("telemedicine", "2. Telemedicine Consultations", "Confirm consultation status and add the video meeting link.", '<div class="space-y-4">' + tm_cards + "</div>")
 
-            <!-- Section 1: Manage Service Requests -->
-            <div class="mt-10">
-                <h2 class="font-heading text-lg font-extrabold text-slate-900">1. Manage Patient Leads, Visa Processing & Appointments</h2>
-                <div class="mt-4 space-y-4">{req_cards}</div>
-            </div>
+    website_section = ""
+    if is_admin:
+        website_section = admin_section(
+            "website", "Website Settings",
+            "Brand, homepage text, banner, contact details and social links. Changes go live on the website immediately.",
+            settings_form,
+        )
 
-            <!-- Section 2: Telemedicine -->
-            <div class="mt-10">
-                <h2 class="font-heading text-lg font-extrabold text-slate-900">2. Telemedicine Video Consultation Scheduling & Meeting Links</h2>
-                <div class="mt-4 space-y-4">{tm_cards}</div>
-            </div>
+    body = (
+        '<section class="bg-gradient-to-br from-brand-950 via-brand-800 to-accent-600 text-white">'
+        '<div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">'
+        '<span class="inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-bold tracking-wide">RBAC Role: ' + role_label + "</span>"
+        '<h1 class="mt-3 font-heading text-3xl font-extrabold tracking-tight">' + panel_title + "</h1>"
+        '<p class="mt-2 max-w-2xl text-sm text-brand-100">' + panel_intro + "</p>"
+        '<div class="mt-5 flex flex-wrap gap-3">'
+        '<a href="/" class="cursor-pointer rounded-xl bg-white px-4 py-2 text-xs font-bold text-brand-900 shadow-sm hover:bg-brand-50">View Live Website</a>'
+        '<a href="/service-request" class="cursor-pointer rounded-xl border border-white/30 px-4 py-2 text-xs font-bold text-white hover:bg-white/10">New Service Request</a>'
+        "</div></div></section>"
+        '<section class="py-8"><div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">'
+        '<div class="grid gap-6 lg:grid-cols-12">'
+        '<aside class="lg:col-span-3"><nav class="med-card sticky top-24 p-3" aria-label="Panel sections">'
+        '<p class="px-3.5 pb-2 pt-1 text-[11px] font-bold uppercase tracking-widest text-slate-400">Navigate</p>'
+        + nav_links + "</nav></aside>"
+        '<div class="space-y-12 lg:col-span-9">'
+        '<section id="overview" class="scroll-mt-28"><div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-' + ("5" if is_admin else "4") + '">' + kpi_html + "</div></section>"
+        + requests_section + telemedicine_section + website_section + (services_section + testimonials_section + users_section if is_admin else "") + inquiries_section
+        + "</div></div></div></section>"
+    )
+    title = "Staff Panel | Med Solutions" if is_staff else "Admin Dashboard | Med Solutions"
+    return layout(title, body, "/staff" if is_staff else "/admin", flash_msg=flash_msg)
 
-            {cms_section}
-            <!-- Section 4: Users & Contacts -->
-            <div class="mt-10 grid gap-6 lg:grid-cols-12">
-            {users_card}
-                <div class="med-card p-5 {contacts_span}">
-                    <h2 class="font-heading font-bold text-slate-900">Recent Contact Inquiries</h2>
-                    <div class="mt-3">{contact_rows}</div>
-                </div>
-            </div>
-        </div>
-    </section>"""
-    return layout("Admin Dashboard | Med Solutions" if not is_staff else "Staff Panel | Med Solutions", body, "/staff" if is_staff else "/admin", flash_msg=flash_msg)
+
+
+BRAND_PALETTE = {
+    "brand": {
+        "50": "#F1F4FC", "100": "#E2E8F8", "200": "#C5D2F0", "300": "#98AEE3", "400": "#5F7FD0",
+        "500": "#3A5BBE", "600": "#2D48A6", "700": "#263B8C", "800": "#243090", "900": "#1E2770", "950": "#151B4D",
+    },
+    "accent": {
+        "50": "#EEF8FD", "100": "#D8F0FC", "200": "#B4E4FC", "300": "#8FCBEA", "400": "#60A8D8",
+        "500": "#3F90C6", "600": "#2D76AA", "700": "#235E8A", "800": "#1D4D72", "900": "#183F5D", "950": "#0E2739",
+    },
+}
+BRAND_PALETTE_JS = json.dumps(BRAND_PALETTE)
 
 
 class MedSolutionsHandler(BaseHTTPRequestHandler):
@@ -1965,7 +2187,7 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
             if not can_manage(_ctx.user):
                 self._send_html(render_forbidden(), status=403)
                 return
-            admin_only = path in ("/admin/update-role", "/admin/update-service")
+            admin_only = path in ("/admin/update-role", "/admin/update-service", "/admin/update-settings", "/admin/add-testimonial", "/admin/update-testimonial", "/admin/delete-testimonial")
             if admin_only and _ctx.user["role"] != "admin":
                 self._send_html(render_forbidden("Only administrators can change user roles or website content."), status=403)
                 return
@@ -2108,6 +2330,55 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
             conn.close()
             msg = urllib.parse.quote("Service content updated successfully.")
             self._redirect(f"{panel_for(_ctx.user)}?flash={msg}")
+
+        elif path == "/admin/update-settings":
+            conn = get_db()
+            for key, default in SETTING_DEFAULTS.items():
+                if key not in form_data:
+                    continue
+                value = form_data.get(key, "").strip()[:500]
+                if key.startswith("social_") and value and not value.startswith(("http://", "https://")):
+                    continue
+                if key in ("brand_name", "helpline_phone", "support_email", "hero_title", "hero_highlight") and not value:
+                    value = default
+                conn.execute(
+                    "INSERT INTO site_settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+                    (key, value),
+                )
+            conn.commit()
+            conn.close()
+            msg = urllib.parse.quote("Website settings saved. Changes are now live on the website.")
+            self._redirect(f"{panel_for(_ctx.user)}?flash={msg}#website")
+
+        elif path in ("/admin/add-testimonial", "/admin/update-testimonial"):
+            fields = testimonial_fields(form_data)
+            if not all(fields[k] for k in TESTIMONIAL_TEXT_FIELDS):
+                msg = urllib.parse.quote("Please fill in the patient name, district, hospital and quote.")
+            else:
+                conn = get_db()
+                if path == "/admin/add-testimonial":
+                    conn.execute(
+                        "INSERT INTO testimonials (patient_name, district, hospital_treated, quote, rating) VALUES (?, ?, ?, ?, ?)",
+                        (fields["patient_name"], fields["district"], fields["hospital_treated"], fields["quote"], fields["rating"]),
+                    )
+                    msg = urllib.parse.quote("New testimonial added to the homepage.")
+                else:
+                    conn.execute(
+                        "UPDATE testimonials SET patient_name = ?, district = ?, hospital_treated = ?, quote = ?, rating = ? WHERE id = ?",
+                        (fields["patient_name"], fields["district"], fields["hospital_treated"], fields["quote"], fields["rating"], int(form_data.get("id", "0"))),
+                    )
+                    msg = urllib.parse.quote("Testimonial updated.")
+                conn.commit()
+                conn.close()
+            self._redirect(f"{panel_for(_ctx.user)}?flash={msg}#testimonials")
+
+        elif path == "/admin/delete-testimonial":
+            conn = get_db()
+            conn.execute("DELETE FROM testimonials WHERE id = ?", (int(form_data.get("id", "0")),))
+            conn.commit()
+            conn.close()
+            msg = urllib.parse.quote("Testimonial removed from the homepage.")
+            self._redirect(f"{panel_for(_ctx.user)}?flash={msg}#testimonials")
 
         elif path == "/admin/update-role":
             conn = get_db()

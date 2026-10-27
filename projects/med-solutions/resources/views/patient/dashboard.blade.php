@@ -11,8 +11,8 @@
                 <p class="mt-1 text-sm text-slate-600">Monitor your medical assistance requests, visa processing updates, and telemedicine video links.</p>
             </div>
             <div class="flex gap-3">
-                <a href="{{ route('services.create') }}" class="cursor-pointer rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800">+ New Service Request</a>
-                <a href="{{ route('consultations.create') }}" class="cursor-pointer rounded-xl border border-cyan-700 bg-white px-4 py-2.5 text-sm font-bold text-cyan-900 hover:bg-cyan-50">Book Telemedicine</a>
+                <a href="{{ route('services.create') }}" class="cursor-pointer rounded-xl btn-brand px-4 py-2.5 text-sm font-bold text-white ">+ New Service Request</a>
+                <a href="{{ route('consultations.create') }}" class="cursor-pointer rounded-xl border border-brand-700 bg-white px-4 py-2.5 text-sm font-bold text-brand-900 hover:bg-brand-50">Book Telemedicine</a>
             </div>
         </div>
 
@@ -36,7 +36,7 @@
                     <tbody class="divide-y divide-slate-100 bg-white">
                         @forelse ($serviceRequests as $req)
                             <tr>
-                                <td class="px-6 py-4 font-mono font-bold text-cyan-900">{{ $req->tracking_code }}</td>
+                                <td class="px-6 py-4 font-mono font-bold text-brand-900">{{ $req->tracking_code }}</td>
                                 <td class="px-6 py-4">
                                     <div class="font-semibold text-slate-900">{{ $req->preferred_hospital ?? 'Hospital Under Review' }}</div>
                                     <div class="text-xs text-slate-500">{{ implode(', ', $req->selected_services ?? [$req->service_type]) }}</div>
@@ -46,7 +46,7 @@
                                 <td class="px-6 py-4"><x-status-badge :status="$req->status" /></td>
                                 <td class="px-6 py-4">
                                     @if ($req->medical_report_path)
-                                        <a href="{{ route('services.report.download', $req) }}" class="text-xs font-bold text-cyan-800 underline hover:text-cyan-950">Download</a>
+                                        <a href="{{ route('services.report.download', $req) }}" class="text-xs font-bold text-brand-800 underline hover:text-brand-950">Download</a>
                                     @else
                                         <span class="text-xs text-slate-400">None</span>
                                     @endif
@@ -71,14 +71,14 @@
                 @forelse ($consultations as $consult)
                     <div class="flex flex-wrap items-center justify-between gap-4 px-6 py-4">
                         <div>
-                            <span class="text-xs font-bold text-cyan-800">{{ $consult->stageLabel() }}</span>
+                            <span class="text-xs font-bold text-brand-800">{{ $consult->stageLabel() }}</span>
                             <h3 class="font-bold text-slate-900">{{ $consult->department }} {{ $consult->preferred_doctor ? '— '.$consult->preferred_doctor : '' }}</h3>
                             <p class="text-xs text-slate-500">Scheduled Date: {{ $consult->preferred_date->format('d M Y, h:i A') }}</p>
                         </div>
                         <div class="flex items-center gap-3">
                             <x-status-badge :status="$consult->status" />
                             @if ($consult->meeting_link)
-                                <a href="{{ $consult->meeting_link }}" target="_blank" rel="noopener" class="cursor-pointer rounded-xl bg-cyan-800 px-4 py-2 text-xs font-bold text-white hover:bg-cyan-900">
+                                <a href="{{ $consult->meeting_link }}" target="_blank" rel="noopener" class="cursor-pointer rounded-xl bg-brand-800 px-4 py-2 text-xs font-bold text-white hover:bg-brand-900">
                                     Join Video Call
                                 </a>
                             @endif

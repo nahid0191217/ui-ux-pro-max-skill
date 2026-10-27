@@ -5,11 +5,34 @@
     --font-sans: 'Noto Sans', 'Figtree', ui-sans-serif, system-ui, sans-serif;
     --font-heading: 'Figtree', 'Noto Sans', ui-sans-serif, system-ui, sans-serif;
 
-    --color-brand-primary: #0E7490;    /* Cyan 700 - >5.3:1 contrast on white */
-    --color-brand-cyan: #0891B2;       /* Cyan 600 */
-    --color-brand-accent: #047857;     /* Emerald 700 - >5.4:1 contrast on white */
-    --color-brand-surface: #F0FDFA;    /* Soft Medical Mint-Cyan Tint */
-    --color-brand-ink: #0F172A;        /* Slate 900 */
+    /* Brand palette derived from the Med Solutions logo: royal blue #243090 + sky blue #60A8D8 */
+    --color-brand-50: #F1F4FC;
+    --color-brand-100: #E2E8F8;
+    --color-brand-200: #C5D2F0;
+    --color-brand-300: #98AEE3;
+    --color-brand-400: #5F7FD0;
+    --color-brand-500: #3A5BBE;
+    --color-brand-600: #2D48A6;
+    --color-brand-700: #263B8C;
+    --color-brand-800: #243090;
+    --color-brand-900: #1E2770;
+    --color-brand-950: #151B4D;
+    --color-accent-50: #EEF8FD;
+    --color-accent-100: #D8F0FC;
+    --color-accent-200: #B4E4FC;
+    --color-accent-300: #8FCBEA;
+    --color-accent-400: #60A8D8;
+    --color-accent-500: #3F90C6;
+    --color-accent-600: #2D76AA;
+    --color-accent-700: #235E8A;
+    --color-accent-800: #1D4D72;
+    --color-accent-900: #183F5D;
+    --color-accent-950: #0E2739;
+    --color-brand-primary: #243090;
+    --color-brand-cyan: #2D48A6;
+    --color-brand-accent: #2D76AA;
+    --color-brand-surface: #F1F4FC;
+    --color-brand-ink: #0F172A;
 }
 
 @layer base {
@@ -34,13 +57,26 @@
 /* Soft UI / Subtle Clinical Depth Utility */
 .med-card {
     background: #FFFFFF;
-    border: 1px solid #CFFAFE;
+    border: 1px solid #D9E2FA;
     border-radius: 1rem;
-    box-shadow: 0 6px 20px -4px rgba(8, 145, 178, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 6px 20px -4px rgba(36, 48, 144, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
     transition: box-shadow 200ms ease, border-color 200ms ease;
 }
 
 .med-card:hover {
-    border-color: #67E8F9;
-    box-shadow: 0 12px 28px -6px rgba(8, 145, 178, 0.14), 0 4px 10px -2px rgba(15, 23, 42, 0.06);
+    border-color: #98AEE3;
+    box-shadow: 0 12px 28px -6px rgba(36, 48, 144, 0.14), 0 4px 10px -2px rgba(15, 23, 42, 0.06);
+}
+
+/* Logo-gradient primary action */
+.btn-brand {
+    background: linear-gradient(120deg, #1E2770 0%, #243090 45%, #2D6CAE 100%);
+    color: #FFFFFF;
+    box-shadow: 0 10px 24px -10px rgba(36, 48, 144, 0.6);
+    transition: transform 200ms ease, box-shadow 200ms ease, filter 200ms ease;
+}
+.btn-brand:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px -10px rgba(36, 48, 144, 0.7);
+    filter: brightness(1.06);
 }

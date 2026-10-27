@@ -7,7 +7,7 @@
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" x-data="{ tab: 'requests' }">
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div>
-                <span class="rounded-full bg-cyan-100 px-3 py-1 text-xs font-bold text-cyan-950">
+                <span class="rounded-full bg-brand-100 px-3 py-1 text-xs font-bold text-brand-950">
                     Role: {{ strtoupper(auth()->user()->role->value) }} ({{ $panel === 'staff' ? 'Staff Panel' : 'Admin Panel' }})
                 </span>
                 <h1 class="mt-2 font-heading text-2xl font-extrabold text-slate-900">{{ $panel === 'staff' ? 'Med Solutions Care Coordinator Panel' : 'Med Solutions Admin & Coordinator Control Panel' }}</h1>
@@ -25,8 +25,8 @@
                 <div class="mt-1 font-heading text-2xl font-extrabold text-amber-700">{{ $stats['pending_requests'] }}</div>
             </div>
             <div class="med-card p-5">
-                <div class="text-xs font-semibold text-cyan-800">Active Visa Files</div>
-                <div class="mt-1 font-heading text-2xl font-extrabold text-cyan-800">{{ $stats['processing_visas'] }}</div>
+                <div class="text-xs font-semibold text-brand-800">Active Visa Files</div>
+                <div class="mt-1 font-heading text-2xl font-extrabold text-brand-800">{{ $stats['processing_visas'] }}</div>
             </div>
             <div class="med-card p-5">
                 <div class="text-xs font-semibold text-emerald-800">Telemedicine Queue</div>
@@ -40,19 +40,19 @@
 
         <!-- Admin Navigation Tabs -->
         <div class="mt-8 flex flex-wrap gap-2 border-b border-slate-200 pb-3">
-            <button type="button" @click="tab = 'requests'" :class="tab === 'requests' ? 'bg-cyan-800 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'" class="cursor-pointer rounded-xl px-4 py-2.5 text-sm font-bold transition">
+            <button type="button" @click="tab = 'requests'" :class="tab === 'requests' ? 'bg-brand-800 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'" class="cursor-pointer rounded-xl px-4 py-2.5 text-sm font-bold transition">
                 1. Service Requests & Visa Status
             </button>
-            <button type="button" @click="tab = 'telemedicine'" :class="tab === 'telemedicine' ? 'bg-cyan-800 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'" class="cursor-pointer rounded-xl px-4 py-2.5 text-sm font-bold transition">
+            <button type="button" @click="tab = 'telemedicine'" :class="tab === 'telemedicine' ? 'bg-brand-800 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'" class="cursor-pointer rounded-xl px-4 py-2.5 text-sm font-bold transition">
                 2. Telemedicine & Video Links
             </button>
             @if ($panel === 'admin')
-            <button type="button" @click="tab = 'cms'" :class="tab === 'cms' ? 'bg-cyan-800 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'" class="cursor-pointer rounded-xl px-4 py-2.5 text-sm font-bold transition">
+            <button type="button" @click="tab = 'cms'" :class="tab === 'cms' ? 'bg-brand-800 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'" class="cursor-pointer rounded-xl px-4 py-2.5 text-sm font-bold transition">
                 3. Services & Content (CMS)
             </button>
             @endif
             @if ($panel === 'admin')
-            <button type="button" @click="tab = 'users'" :class="tab === 'users' ? 'bg-cyan-800 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'" class="cursor-pointer rounded-xl px-4 py-2.5 text-sm font-bold transition">
+            <button type="button" @click="tab = 'users'" :class="tab === 'users' ? 'bg-brand-800 text-white' : 'bg-white text-slate-700 hover:bg-slate-100'" class="cursor-pointer rounded-xl px-4 py-2.5 text-sm font-bold transition">
                 4. User & Role Management
             </button>
             @endif
@@ -68,7 +68,7 @@
                     <div class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 pb-4">
                         <div>
                             <div class="flex items-center gap-3">
-                                <span class="font-mono text-sm font-extrabold text-cyan-900">{{ $req->tracking_code }}</span>
+                                <span class="font-mono text-sm font-extrabold text-brand-900">{{ $req->tracking_code }}</span>
                                 <x-status-badge :status="$req->status" />
                             </div>
                             <h3 class="mt-1 text-base font-bold text-slate-900">{{ $req->patient_name }} ({{ $req->phone }})</h3>
@@ -77,7 +77,7 @@
                             </p>
                         </div>
                         @if ($req->medical_report_path)
-                            <a href="{{ route('services.report.download', $req) }}" class="rounded-lg bg-cyan-50 px-3 py-1.5 text-xs font-bold text-cyan-900 ring-1 ring-cyan-200 hover:bg-cyan-100">
+                            <a href="{{ route('services.report.download', $req) }}" class="rounded-lg bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-900 ring-1 ring-brand-200 hover:bg-brand-100">
                                 Download Medical Report
                             </a>
                         @endif
@@ -124,7 +124,7 @@
 
                     <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
                         <input type="text" name="admin_notes" value="{{ $req->admin_notes }}" placeholder="Coordinator update note visible on patient status tracker (VIL, flight, pickup, stay)..." class="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs">
-                        <button type="submit" class="cursor-pointer shrink-0 rounded-lg bg-emerald-700 px-5 py-2 text-xs font-bold text-white hover:bg-emerald-800">
+                        <button type="submit" class="cursor-pointer shrink-0 rounded-lg btn-brand px-5 py-2 text-xs font-bold text-white ">
                             Save Status Update
                         </button>
                     </div>
@@ -142,7 +142,7 @@
                     @method('PATCH')
                     <div class="grid items-end gap-4 sm:grid-cols-12">
                         <div class="sm:col-span-4">
-                            <span class="text-xs font-bold text-cyan-800">{{ $consult->stageLabel() }}</span>
+                            <span class="text-xs font-bold text-brand-800">{{ $consult->stageLabel() }}</span>
                             <h3 class="font-bold text-slate-900">{{ $consult->patient_name }} ({{ $consult->phone }})</h3>
                             <p class="text-xs text-slate-500">{{ $consult->department }} • {{ $consult->preferred_date->format('d M Y, h:i A') }}</p>
                         </div>
@@ -159,7 +159,7 @@
                             <input type="url" name="meeting_link" value="{{ $consult->meeting_link }}" placeholder="https://meet.google.com/..." class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-xs">
                         </div>
                         <div class="sm:col-span-2">
-                            <button type="submit" class="w-full cursor-pointer rounded-lg bg-cyan-800 px-4 py-2 text-xs font-bold text-white hover:bg-cyan-900">Save Link</button>
+                            <button type="submit" class="w-full cursor-pointer rounded-lg bg-brand-800 px-4 py-2 text-xs font-bold text-white hover:bg-brand-900">Save Link</button>
                         </div>
                     </div>
                 </form>
@@ -180,7 +180,7 @@
                             <option value="1" @selected($svc->is_active)>Active (Visible)</option>
                             <option value="0" @selected(! $svc->is_active)>Inactive (Hidden)</option>
                         </select>
-                        <button type="submit" class="cursor-pointer rounded-lg bg-cyan-800 px-4 py-1.5 text-xs font-bold text-white">Update Service</button>
+                        <button type="submit" class="cursor-pointer rounded-lg bg-brand-800 px-4 py-1.5 text-xs font-bold text-white">Update Service</button>
                     </div>
                 </form>
             @endforeach
