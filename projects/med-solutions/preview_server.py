@@ -15,6 +15,7 @@ import secrets
 import threading
 import time
 import os
+import sys
 import random
 import re
 import sqlite3
@@ -1895,6 +1896,12 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
     _token = ""
     _secure = False
     _had_cookie = False
+
+    def log_message(self, format, *args) -> None:
+        # Diagnostic: record whether the browser sent the session cookie (value is never logged).
+        cookie_header = self.headers.get("Cookie", "") or ""
+        has_cookie = "yes" if SESSION_COOKIE + "=" in cookie_header else "no"
+        sys.stderr.write("%s - - [%s] %s cookie=%s\n" % (self.address_string(), self.log_date_time_string(), format % args, has_cookie))
 
     def _send_cookie(self) -> None:
         # Served inside a cross-site iframe in Arena, so SameSite=Lax cookies are dropped on POST.
