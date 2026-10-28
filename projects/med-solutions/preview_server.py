@@ -28,6 +28,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 RUNTIME_DIR = "/tmp/med_solutions_preview"
 UPLOAD_DIR = os.path.join(RUNTIME_DIR, "uploads")
 DB_PATH = os.path.join(RUNTIME_DIR, "med_solutions_v2_auth.sqlite3")
+PREVIEW_CSS_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "public", "css", "preview.css")
 LOGO_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "public", "images", "med-solutions-logo.jpeg")
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -739,23 +740,10 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{e(title)}</title>
     <link rel="icon" type="image/jpeg" href="/images/med-solutions-logo.jpeg">
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {{
-            theme: {{
-                extend: {{
-                    colors: {BRAND_PALETTE_JS},
-                    fontFamily: {{
-                        sans: ['Noto Sans', 'Figtree', 'sans-serif'],
-                        heading: ['Figtree', 'Noto Sans', 'sans-serif'],
-                    }}
-                }}
-            }}
-        }};
-    </script>
+    <link rel="stylesheet" href="/css/preview.css">
     <style>
         .med-card {{
             background: #FFFFFF;
@@ -2174,6 +2162,8 @@ class MedSolutionsHandler(BaseHTTPRequestHandler):
                 self._redirect(f"{panel_for(_ctx.user)}?flash={msg}")
             else:
                 self._send_html(render_admin_dashboard(flash_msg=flash, panel=wanted), head_only=head_only)
+        elif path == "/css/preview.css":
+            self._send_file(PREVIEW_CSS_PATH, "text/css; charset=utf-8", head_only=head_only)
         elif path == "/images/med-solutions-logo.jpeg":
             self._send_file(LOGO_PATH, "image/jpeg", head_only=head_only)
         elif path == "/up":

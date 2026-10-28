@@ -135,3 +135,13 @@ php artisan serve
 The header contains a **Quick Role Switcher** (Admin / Staff / Patient) that signs you in as a seeded demo account without a password. It is for demonstrations only:
 - Laravel: enabled only when `DEMO_ROLE_SWITCHER=true` **and** `APP_ENV` is not `production` (see `config/demo.php`). The default is `false`.
 - Live preview server: disabled by default (the header switcher is hidden); set `DEMO_ROLE_SWITCHER=1` to show it for demos.
+
+## Preview stylesheet (no CDN)
+
+The standalone preview (`preview_server.py`) serves a prebuilt Tailwind v3 stylesheet from `public/css/preview.css`, so the layout does not depend on the Tailwind CDN. After changing any Tailwind class in `preview_server.py`, rebuild it:
+
+```bash
+npx -p tailwindcss@3.4.17 tailwindcss -c tailwind.preview.config.js -i resources/css/preview.css -o public/css/preview.css --minify
+```
+
+Classes that are built by joining strings at runtime must be added to `safelist` in `tailwind.preview.config.js`.
