@@ -738,6 +738,7 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{e(title)}</title>
+    <script>document.documentElement.classList.add('js');</script>
     <link rel="icon" type="image/jpeg" href="/images/med-solutions-logo.jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -785,6 +786,53 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
             background-clip: text;
             color: transparent;
         }}
+        body {{
+            background-color: #F6F8FD;
+            background-image:
+                radial-gradient(900px 480px at 8% -8%, rgba(152, 174, 227, 0.28) 0%, transparent 60%),
+                radial-gradient(800px 440px at 100% 0%, rgba(96, 168, 216, 0.22) 0%, transparent 55%),
+                radial-gradient(700px 500px at 50% 110%, rgba(36, 48, 144, 0.07) 0%, transparent 60%);
+            background-attachment: fixed;
+        }}
+        .med-card {{
+            border-radius: 1.25rem;
+            border-color: rgba(36, 48, 144, 0.10);
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 30px -12px rgba(36, 48, 144, 0.14);
+            transition: transform 250ms ease, box-shadow 250ms ease, border-color 250ms ease;
+        }}
+        .med-card:hover {{
+            transform: translateY(-3px);
+            border-color: rgba(36, 48, 144, 0.22);
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.05), 0 20px 40px -14px rgba(36, 48, 144, 0.22);
+        }}
+        .eyebrow {{
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(36, 48, 144, 0.14);
+            background: rgba(255, 255, 255, 0.8);
+            padding: 0.375rem 0.875rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #1E2770;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+        }}
+        .js .reveal {{
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity 700ms cubic-bezier(0.2, 0.7, 0.2, 1), transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+        }}
+        .js .reveal.is-visible {{
+            opacity: 1;
+            transform: none;
+        }}
+        @media (prefers-reduced-motion: reduce) {{
+            .js .reveal {{ opacity: 1; transform: none; transition: none; }}
+            .med-card:hover {{ transform: none; }}
+        }}
         @media (prefers-reduced-motion: reduce) {{
             html {{ scroll-behavior: auto; }}
             *, *::before, *::after {{
@@ -794,7 +842,7 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
         }}
     </style>
 </head>
-<body class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased selection:bg-brand-100 selection:text-brand-950">
+<body class="min-h-screen font-sans text-slate-900 antialiased selection:bg-brand-100 selection:text-brand-950">
     <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-brand-800 focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold text-white">
         Skip to main content
     </a>
@@ -802,7 +850,7 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
     {topbar_html}
 
     <!-- Main Navbar -->
-    <header class="sticky top-0 z-40 border-b border-brand-100 bg-white/95 backdrop-blur-md">
+    <header class="sticky top-0 z-40 border-b border-brand-100/70 bg-white/75 shadow-sm shadow-brand-900/5 backdrop-blur-xl">
         <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8" aria-label="Main Navigation">
             <a href="/" class="flex items-center gap-3 cursor-pointer rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700">
                 <img src="/images/med-solutions-logo.jpeg" alt="{e(brand_name)} logo" class="h-12 w-auto sm:h-14">
@@ -846,7 +894,7 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
         {body}
     </main>
 
-    <footer class="mt-16 border-t border-slate-200 bg-slate-950 text-slate-300">
+    <footer class="mt-20 bg-gradient-to-b from-slate-950 to-brand-950 text-slate-300">
         <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
             <div class="grid gap-10 md:grid-cols-2">
                 <div>
@@ -886,6 +934,20 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
         </div>
     </footer>
     <script>
+        var revealEls = document.querySelectorAll('.reveal');
+        if ('IntersectionObserver' in window) {{
+            var revealObserver = new IntersectionObserver(function (entries) {{
+                entries.forEach(function (entry) {{
+                    if (entry.isIntersecting) {{
+                        entry.target.classList.add('is-visible');
+                        revealObserver.unobserve(entry.target);
+                    }}
+                }});
+            }}, {{ threshold: 0.12 }});
+            revealEls.forEach(function (el) {{ revealObserver.observe(el); }});
+        }} else {{
+            revealEls.forEach(function (el) {{ el.classList.add('is-visible'); }});
+        }}
         var onAuthPage = window.location.pathname.indexOf('/login') === 0 || window.location.pathname.indexOf('/register') === 0;
         if (window.top !== window.self && onAuthPage) {{
             document.getElementById('frame-notice').classList.remove('hidden');
@@ -914,7 +976,7 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
         num = f"{idx + 1:02d}"
         link = "/telemedicine" if svc["slug"] == "telemedicine" else f"/service-request?service={e(svc['slug'])}"
         cards_html += f"""
-        <article class="med-card group flex flex-col justify-between p-6">
+        <article class="med-card reveal group flex flex-col justify-between p-6">
             <div>
                 <div class="mb-5 flex items-center justify-between">
                     <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-800 ring-1 ring-brand-200 transition-colors duration-200 group-hover:bg-brand-700 group-hover:text-white">
@@ -968,17 +1030,19 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
 
     body = f"""
     <!-- HERO SECTION -->
-    <section class="relative overflow-hidden bg-gradient-to-br from-brand-50 via-white to-emerald-50/60 py-14 sm:py-20">
+    <section class="relative overflow-hidden py-14 sm:py-20">
+        <div aria-hidden="true" class="pointer-events-none absolute -left-32 -top-40 h-[28rem] w-[28rem] rounded-full bg-brand-200/60 blur-3xl"></div>
+        <div aria-hidden="true" class="pointer-events-none absolute -right-28 top-6 h-[24rem] w-[24rem] rounded-full bg-accent-200/70 blur-3xl"></div>
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="grid items-center gap-12 lg:grid-cols-12">
                 <div class="lg:col-span-7">
                     <div class="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-4 py-1.5 text-xs font-bold text-brand-900 shadow-sm">
-                        <span class="h-2 w-2 rounded-full bg-emerald-600" aria-hidden="true"></span>
+                        <span class="relative flex h-2.5 w-2.5" aria-hidden="true"><span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent-400 opacity-75"></span><span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent-500"></span></span>
                         <span>{e(hero_badge)}</span>
                     </div>
 
                     <h1 class="mt-6 font-heading text-3xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
-                        {e(hero_title)} <span class="text-brand-800">{e(hero_highlight)}</span>
+                        {e(hero_title)} <span class="text-gradient">{e(hero_highlight)}</span>
                     </h1>
 
                     <p class="mt-5 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
@@ -1052,6 +1116,17 @@ def render_home(flash_msg: str = "", error_msg: str = "") -> bytes:
     </section>
 
     <!-- ABOUT US -->
+    <section class="relative z-10 -mt-10 pb-4">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-white/80 bg-brand-100/70 shadow-xl shadow-brand-900/10 lg:grid-cols-4">
+                <div class="bg-white/95 p-6 sm:p-7"><div class="font-heading text-3xl font-extrabold text-gradient">{len(services)}</div><div class="mt-1 text-sm font-semibold text-slate-600">Core assistance services</div></div>
+                <div class="bg-white/95 p-6 sm:p-7"><div class="font-heading text-3xl font-extrabold text-gradient">24/7</div><div class="mt-1 text-sm font-semibold text-slate-600">Helpline for patients</div></div>
+                <div class="bg-white/95 p-6 sm:p-7"><div class="font-heading text-3xl font-extrabold text-gradient">BD &rarr; IN</div><div class="mt-1 text-sm font-semibold text-slate-600">Bangladesh to India care</div></div>
+                <div class="bg-white/95 p-6 sm:p-7"><div class="font-heading text-3xl font-extrabold text-gradient">Live</div><div class="mt-1 text-sm font-semibold text-slate-600">Status tracking and secure report upload</div></div>
+            </div>
+        </div>
+    </section>
+
     <section id="about" class="bg-white py-16">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="grid items-center gap-10 lg:grid-cols-2">
