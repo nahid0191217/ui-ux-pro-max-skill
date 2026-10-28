@@ -738,7 +738,6 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{e(title)}</title>
-    <script>document.documentElement.classList.add('js');</script>
     <link rel="icon" type="image/jpeg" href="/images/med-solutions-logo.jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -792,7 +791,6 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
                 radial-gradient(900px 480px at 8% -8%, rgba(152, 174, 227, 0.28) 0%, transparent 60%),
                 radial-gradient(800px 440px at 100% 0%, rgba(96, 168, 216, 0.22) 0%, transparent 55%),
                 radial-gradient(700px 500px at 50% 110%, rgba(36, 48, 144, 0.07) 0%, transparent 60%);
-            background-attachment: fixed;
         }}
         .med-card {{
             border-radius: 1.25rem;
@@ -820,17 +818,15 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
             color: #1E2770;
             box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
         }}
-        .js .reveal {{
-            opacity: 0;
-            transform: translateY(18px);
-            transition: opacity 700ms cubic-bezier(0.2, 0.7, 0.2, 1), transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+        @keyframes med-rise {{
+            from {{ opacity: 0; transform: translateY(14px); }}
+            to {{ opacity: 1; transform: none; }}
         }}
-        .js .reveal.is-visible {{
-            opacity: 1;
-            transform: none;
+        .reveal {{
+            animation: med-rise 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
         }}
         @media (prefers-reduced-motion: reduce) {{
-            .js .reveal {{ opacity: 1; transform: none; transition: none; }}
+            .reveal {{ animation: none; }}
             .med-card:hover {{ transform: none; }}
         }}
         @media (prefers-reduced-motion: reduce) {{
@@ -934,20 +930,6 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
         </div>
     </footer>
     <script>
-        var revealEls = document.querySelectorAll('.reveal');
-        if ('IntersectionObserver' in window) {{
-            var revealObserver = new IntersectionObserver(function (entries) {{
-                entries.forEach(function (entry) {{
-                    if (entry.isIntersecting) {{
-                        entry.target.classList.add('is-visible');
-                        revealObserver.unobserve(entry.target);
-                    }}
-                }});
-            }}, {{ threshold: 0.12 }});
-            revealEls.forEach(function (el) {{ revealObserver.observe(el); }});
-        }} else {{
-            revealEls.forEach(function (el) {{ el.classList.add('is-visible'); }});
-        }}
         var onAuthPage = window.location.pathname.indexOf('/login') === 0 || window.location.pathname.indexOf('/register') === 0;
         if (window.top !== window.self && onAuthPage) {{
             document.getElementById('frame-notice').classList.remove('hidden');

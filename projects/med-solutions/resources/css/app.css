@@ -87,7 +87,6 @@ body {
     background-image:
         radial-gradient(900px 480px at 8% -8%, rgba(152, 174, 227, 0.28) 0%, transparent 60%),
         radial-gradient(800px 440px at 100% 0%, rgba(96, 168, 216, 0.22) 0%, transparent 55%);
-    background-attachment: fixed;
 }
 .med-card {
     border-radius: 1.25rem;
