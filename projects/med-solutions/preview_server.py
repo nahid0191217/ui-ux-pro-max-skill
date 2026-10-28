@@ -837,10 +837,10 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
     <header class="sticky top-0 z-40 border-b border-brand-100/70 bg-white/75 shadow-sm shadow-brand-900/5 backdrop-blur-xl">
         <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8" aria-label="Main Navigation">
             <a href="/" class="flex items-center gap-3 cursor-pointer rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700">
-                <img src="/images/med-solutions-logo.jpeg" alt="{e(brand_name)} logo" class="h-12 w-auto sm:h-14">
-                <div class="hidden sm:block leading-tight">
-                    <span class="block font-heading text-lg font-extrabold tracking-tight text-brand-900">{e(brand_name)}</span>
-                    <span class="block text-[11px] font-semibold uppercase tracking-widest text-accent-600">{e(brand_tagline)}</span>
+                <img src="/images/med-solutions-logo.jpeg" alt="{e(brand_name)} logo" class="h-10 w-auto sm:h-14">
+                <div class="min-w-0 leading-tight">
+                    <span class="block whitespace-nowrap font-heading text-base font-extrabold tracking-tight text-brand-900 sm:text-lg">{e(brand_name)}</span>
+                    <span class="hidden whitespace-nowrap text-[11px] font-semibold uppercase tracking-widest text-accent-600 md:block">{e(brand_tagline)}</span>
                 </div>
             </a>
 
