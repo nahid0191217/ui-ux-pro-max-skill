@@ -52,9 +52,9 @@
     <!-- Sticky Main Header -->
     <header x-data="{ mobileOpen: false }" class="sticky top-0 z-40 border-b border-brand-100 bg-white/95 backdrop-blur-md">
         <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8" aria-label="Main Navigation">
-            <a href="{{ route('home') }}" class="flex items-center gap-3 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 rounded-lg">
-                <img src="{{ asset('images/med-solutions-logo.jpeg') }}" alt="Med Solutions logo" class="h-10 w-auto sm:h-14">
-                <div class="min-w-0 leading-tight">
+            <a href="{{ route('home') }}" class="flex shrink-0 items-center gap-2.5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 rounded-lg">
+                <img src="{{ asset('images/med-solutions-logo.jpeg') }}" alt="Med Solutions logo" class="h-10 w-auto shrink-0 sm:h-11 lg:h-12">
+                <div class="shrink-0 leading-tight">
                     <span class="block whitespace-nowrap font-heading text-base font-extrabold tracking-tight text-brand-900 sm:text-lg">Med Solutions</span>
                     <span class="hidden whitespace-nowrap text-[11px] font-semibold uppercase tracking-widest text-accent-600 md:block">Cross-Border Medical Care</span>
                 </div>

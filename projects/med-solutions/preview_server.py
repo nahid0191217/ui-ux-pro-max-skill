@@ -835,16 +835,16 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
 
     <!-- Main Navbar -->
     <header class="sticky top-0 z-40 border-b border-brand-100/70 bg-white/75 shadow-sm shadow-brand-900/5 backdrop-blur-xl">
-        <nav class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6 lg:px-8" aria-label="Main Navigation">
-            <a href="/" class="flex items-center gap-3 cursor-pointer rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700">
-                <img src="/images/med-solutions-logo.jpeg" alt="{e(brand_name)} logo" class="h-10 w-auto sm:h-14">
-                <div class="min-w-0 leading-tight">
+        <nav class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3 sm:px-6 lg:px-8" aria-label="Main Navigation">
+            <a href="/" class="flex shrink-0 items-center gap-2.5 cursor-pointer rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700">
+                <img src="/images/med-solutions-logo.jpeg" alt="{e(brand_name)} logo" class="h-10 w-auto shrink-0 sm:h-11 lg:h-12">
+                <div class="shrink-0 leading-tight">
                     <span class="block whitespace-nowrap font-heading text-base font-extrabold tracking-tight text-brand-900 sm:text-lg">{e(brand_name)}</span>
                     <span class="hidden whitespace-nowrap text-[11px] font-semibold uppercase tracking-widest text-accent-600 md:block">{e(brand_tagline)}</span>
                 </div>
             </a>
 
-            <div class="hidden lg:flex lg:items-center lg:gap-6 text-sm">
+            <div class="hidden lg:flex lg:flex-wrap lg:items-center lg:gap-x-5 lg:gap-y-2 text-sm">
                 <a href="/#about" class="cursor-pointer transition-colors {nav_cls('/about')}">About Us</a>
                 <a href="/#services" class="cursor-pointer transition-colors {nav_cls('/services')}">Services</a>
                 <a href="/#pre-travel-guide" class="cursor-pointer transition-colors {nav_cls('/guide')}">Pre-Travel Guide</a>
@@ -857,7 +857,7 @@ def layout(title: str, body: str, active_path: str = "/", flash_msg: str = "", e
                 {acct_html}
                 <a href="/service-request" class="cursor-pointer inline-flex items-center gap-2 rounded-xl btn-brand px-4 py-2.5 text-xs sm:text-sm font-bold text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-700 focus-visible:ring-offset-2">
                     <span>Request Assistance</span>
-                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <svg class="hidden h-4 w-4 sm:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path d="M5 12h14M12 5l7 7-7 7"/>
                     </svg>
                 </a>
